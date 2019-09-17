@@ -1,0 +1,450 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ImGUI-1.72b\imgui.cpp">
+      <Filter>imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-1.72b\imgui_demo.cpp">
+      <Filter>imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-1.72b\imgui_draw.cpp">
+      <Filter>imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-1.72b\imgui_impl_opengl3.cpp">
+      <Filter>imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-1.72b\imgui_impl_sdl.cpp">
+      <Filter>imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-1.72b\imgui_widgets.cpp">
+      <Filter>imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Analytics.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="UI.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnectedNode.cpp">
+      <Filter>ComputationalNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Datasets.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="SigmoidNode.cpp">
+      <Filter>ComputationalNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="MNIST.cpp">
+      <Filter>MNIST</Filter>
+    </ClCompile>
+    <ClCompile Include="ML.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetwork.cpp">
+      <Filter>Neural Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvolutionNode.cpp">
+      <Filter>ComputationalNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="L2PoolingNode.cpp">
+      <Filter>ComputationalNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="MaxPoolingNode.cpp">
+      <Filter>ComputationalNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="ReluNode.cpp">
+      <Filter>ComputationalNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TanhNode.cpp">
+      <Filter>ComputationalNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvolutionLayer.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnectedLayer.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="SDL2-2.0.10\include\SDL.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_assert.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_atomic.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_audio.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_bits.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_blendmode.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_clipboard.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_android.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_iphoneos.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_macosx.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_minimal.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_pandora.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_psp.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_windows.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_winrt.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_config_wiz.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_copying.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_cpuinfo.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_egl.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_endian.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_error.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_events.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_filesystem.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_gamecontroller.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_gesture.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_haptic.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_hints.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_joystick.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_keyboard.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_keycode.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_loadso.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_log.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_main.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_messagebox.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_mouse.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_mutex.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_name.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_opengl.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_opengl_glext.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_opengles.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_opengles2.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_opengles2_gl2.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_opengles2_gl2ext.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_opengles2_gl2platform.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_opengles2_khrplatform.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_pixels.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_platform.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_power.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_quit.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_rect.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_render.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_revision.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_rwops.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_scancode.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_sensor.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_shape.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_stdinc.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_surface.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_system.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_syswm.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_assert.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_common.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_compare.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_crc32.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_font.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_fuzzer.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_harness.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_images.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_log.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_md5.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_memory.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_test_random.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_thread.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_timer.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_touch.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_types.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_version.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_video.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\SDL_vulkan.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI-1.72b\imgui.h">
+      <Filter>imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI-1.72b\imgui_impl_opengl3.h">
+      <Filter>imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI-1.72b\imgui_impl_sdl.h">
+      <Filter>imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI-1.72b\imgui_internal.h">
+      <Filter>imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="glew-2.1.0\include\GL\glew.h">
+      <Filter>Glew</Filter>
+    </ClInclude>
+    <ClInclude Include="Analytics.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="Window.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Module.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\begin_code.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL2-2.0.10\include\close_code.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnectedNode.h">
+      <Filter>ComputationalNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="Datasets.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="MNIST.h">
+      <Filter>MNIST</Filter>
+    </ClInclude>
+    <ClInclude Include="ML.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetwork.h">
+      <Filter>Neural Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SigmoidNode.h">
+      <Filter>ComputationalNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvolutionNode.h">
+      <Filter>ComputationalNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="L2PoolingNode.h">
+      <Filter>ComputationalNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="MaxPoolingNode.h">
+      <Filter>ComputationalNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ReluNode.h">
+      <Filter>ComputationalNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TanhNode.h">
+      <Filter>ComputationalNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvolutionLayer.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnectedLayer.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvolutionLayerNode.h">
+      <Filter>ComputationalNodes\Polimorphism</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputationNode.h">
+      <Filter>ComputationalNodes\Polimorphism</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnectedLayerNode.h">
+      <Filter>ComputationalNodes\Polimorphism</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SDL2-2.0.10\include\SDL_config.h.cmake">
+      <Filter>SDL</Filter>
+    </None>
+    <None Include="SDL2-2.0.10\include\SDL_config.h.in">
+      <Filter>SDL</Filter>
+    </None>
+    <None Include="SDL2-2.0.10\include\SDL_config_macosx.h.orig">
+      <Filter>SDL</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SDL">
+      <UniqueIdentifier>{32c50ae0-94cb-4d27-b211-b58ca8434ae9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imGui">
+      <UniqueIdentifier>{0e43300b-9980-4806-92d9-99c4ec8f1219}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Glew">
+      <UniqueIdentifier>{db5d6ade-dc38-4b71-90f3-56f5d37eeb44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules">
+      <UniqueIdentifier>{cfb8d200-afa8-4ddc-ba97-4cb4cac17f74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ComputationalNodes">
+      <UniqueIdentifier>{4fbf4598-8232-403d-ad8e-0c8b5bcd1dfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MNIST">
+      <UniqueIdentifier>{bf9c5ddb-2108-4a7a-b6a4-2a368ccee80a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Neural Network">
+      <UniqueIdentifier>{28e6b7b9-d186-49ad-ab44-d721542a525c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Layer">
+      <UniqueIdentifier>{d4a26186-9d4f-4f9b-a25c-2e0506f2f557}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ComputationalNodes\Polimorphism">
+      <UniqueIdentifier>{567430fa-d05f-4be9-95f5-bcda2e94473c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

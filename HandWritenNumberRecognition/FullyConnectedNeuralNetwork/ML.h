@@ -1,0 +1,36 @@
+#ifndef ML_
+#define ML_
+
+#include <vector>
+#include <thread>
+
+#include "Module.h"
+
+class NeuralNetwork;
+
+class ML: public Module
+{
+public:
+	ML();
+	~ML();
+
+	// Functionality
+	bool Init() override;
+	bool Start() override;
+	bool PreUpdate() override;
+	bool Update() override;
+	bool PostUpdate() override;
+	bool CleanUp() override;
+
+private:
+	NeuralNetwork* network;
+
+	int output;
+
+	std::thread* training_thread;
+
+	bool training = false;
+	int training_sesion;
+};
+
+#endif // !ML_

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+VisualStudioVersion = 15.0.28307.779
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HandWritenNumberRecognition", "HandWritenNumberRecognition\HandWritenNumberRecognition.vcxproj", "{B41B5AC7-11C5-484A-BDB7-69D292233215}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FullyConnectedNeuralNetwork", "FullyConnectedNeuralNetwork\HandWritenNumberRecognition.vcxproj", "{B41B5AC7-11C5-484A-BDB7-69D292233215}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConvolutionalConnectedNeuralNetwork", "ConvolutionalConnectedNeuralNetwork\ConvolutionalConnectedNeuralNetwork.vcxproj", "{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,11 +23,19 @@ Global
 		{B41B5AC7-11C5-484A-BDB7-69D292233215}.Release|x64.Build.0 = Release|x64
 		{B41B5AC7-11C5-484A-BDB7-69D292233215}.Release|x86.ActiveCfg = Release|Win32
 		{B41B5AC7-11C5-484A-BDB7-69D292233215}.Release|x86.Build.0 = Release|Win32
+		{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}.Debug|x64.ActiveCfg = Debug|x64
+		{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}.Debug|x64.Build.0 = Debug|x64
+		{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}.Debug|x86.ActiveCfg = Debug|Win32
+		{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}.Debug|x86.Build.0 = Debug|Win32
+		{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}.Release|x64.ActiveCfg = Release|x64
+		{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}.Release|x64.Build.0 = Release|x64
+		{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}.Release|x86.ActiveCfg = Release|Win32
+		{8D04C56B-DFDA-4272-A0CB-30F40A9DA6E4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {72B9B9ED-CE82-4F01-9F7B-62A56FF7D8A5}
+		SolutionGuid = {7136CA9E-358B-47FE-9EED-4D87DA0CC69E}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,7 @@
+<map id="Eigen::Ref&lt; SparseMatrixType, Options &gt;" name="Eigen::Ref&lt; SparseMatrixType, Options &gt;">
+<area shape="rect" id="node2" href="$classEigen_1_1SparseMapBase_3_01Derived_00_01WriteAccessors_01_4.html" title="Common base class for writable Map and Ref instance of sparse matrix and vector. " alt="" coords="19,1343,211,1611"/>
+<area shape="rect" id="node3" href="$classEigen_1_1SparseMapBase_3_01Derived_00_01ReadOnlyAccessors_01_4.html" title="Common base class for Map and Ref instance of sparse matrix and vector. " alt="" coords="5,953,224,1295"/>
+<area shape="rect" id="node4" href="$classEigen_1_1SparseCompressedBase.html" title="Common base class for sparse [compressed]&#45;{row|column}&#45;storage format. " alt="" coords="11,623,219,905"/>
+<area shape="rect" id="node5" href="$classEigen_1_1SparseMatrixBase.html" title="Base class of any sparse matrices or sparse expressions. " alt="" coords="29,292,200,575"/>
+<area shape="rect" id="node6" href="$structEigen_1_1EigenBase.html" title="{Eigen::EigenBase\&lt; Derived \&gt;\n||+ addTo()\l+ applyThisOnTheLeft()\l+ applyThisOnTheRight()\l+ cols()\l+ const_cast_derived()\l+ const_derived()\l+ derived()\l+ derived()\l+ evalTo()\l+ rows()\l+ size()\l+ subTo()\l}" alt="" coords="17,5,212,244"/>
+</map>
