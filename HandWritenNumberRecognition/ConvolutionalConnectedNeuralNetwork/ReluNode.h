@@ -11,15 +11,19 @@ public:
 	~ReluNode();
 
 	// Fully Connected
-	void Forward(const Eigen::VectorXd& input, Eigen::VectorXd& output) const override;
-	void Backward(const Eigen::VectorXd& input, const Eigen::VectorXd& gradient, Eigen::VectorXd& output) override;
+	void Forward(Eigen::VectorXd& input) const override;
+	void Backward(const Eigen::VectorXd& input, Eigen::VectorXd& gradient) override;
 
 	// Convolution
-	void Forward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& output) const override;
-	void Backward(const std::vector<Eigen::MatrixXd>& inputs, const std::vector<Eigen::MatrixXd>& gradients, std::vector<Eigen::MatrixXd>& output) override;
+	void Forward(std::vector<Eigen::MatrixXd>& inputs) const override;
+	void Backward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& gradients) override;
 
 	static double Relu(double input);
 	static double Derivative(double input);
+
+	// UI
+	bool UINode() const override;
+	void UIDescription() const override;
 };
 
 #endif //!RELU_NODE

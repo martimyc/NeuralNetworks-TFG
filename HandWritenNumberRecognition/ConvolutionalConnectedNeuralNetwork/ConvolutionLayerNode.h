@@ -10,8 +10,12 @@ public:
 	ConvolutionLayerNode() {}
 	virtual ~ConvolutionLayerNode() {}
 
-	virtual void Forward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& output) const = 0;
-	virtual void Backward(const std::vector<Eigen::MatrixXd>& inputs, const std::vector<Eigen::MatrixXd>& gradient, std::vector<Eigen::MatrixXd>& output) = 0; // Chain rule
+	virtual void Forward(std::vector<Eigen::MatrixXd>& inputs) const = 0;
+	virtual void Backward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& gradient) = 0; // Chain rule
+
+	// UI
+	virtual bool UINode() const = 0;
+	virtual void UIDescription() const = 0;
 };
 
 

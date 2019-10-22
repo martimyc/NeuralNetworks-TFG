@@ -47,6 +47,7 @@ public:
 	virtual inline const Eigen::VectorXd& GetZ() = 0;
 	virtual inline const Eigen::VectorXd& GetActivation() = 0;
 	virtual inline const Eigen::MatrixXd& GetWeights() = 0;
+	virtual inline const Eigen::VectorXd& GetBiases() = 0;
 	virtual inline const int GetNumNeurons() const = 0;
 
 protected:

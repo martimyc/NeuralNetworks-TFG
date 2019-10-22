@@ -23,14 +23,14 @@ void MNIST::LoadImage(std::ifstream& file, int width, int height)
 	this->width = width;
 	this->height = height;
 
-	pixels.resize(width * height);
+	pixels.resize(width, height);
 
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++)
 		{
 			file.read((char*)&byte, 1);
-			pixels[i*width + j] = float((int)byte) / 255.0;
+			pixels(i,j) = float((int)byte) / 255.0;
 		}
 	}
 }
@@ -65,7 +65,7 @@ void MNIST::InitTexture()
 		for (int j = 0; j < height; j++)
 		{
 			int num_pixel = i * height * 3 + j * 3;
-			float pixel_val = pixels[i * width + j];
+			float pixel_val = pixels(i,j);
 
 			texture_pixels[num_pixel] = pixel_val;
 			texture_pixels[num_pixel + 1] = pixel_val;

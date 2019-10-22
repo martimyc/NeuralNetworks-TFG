@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdint.h>
+#include <sstream>
 
 #include "imgui.h"
 
@@ -20,12 +21,6 @@ bool Dataset::Init()
 	training_load_thread = new std::thread(&Dataset::LoadTraining, std::ref(*this));
 	test_load_thread = new std::thread(&Dataset::LoadTest, std::ref(*this));
 
-	training_load_thread->detach();
-	delete training_load_thread;
-
-	test_load_thread->detach();
-	delete test_load_thread;
-
 	return true;
 }
 
@@ -36,6 +31,55 @@ bool Dataset::PreUpdate()
 
 bool Dataset::Update()
 {
+	ImGui::Begin("Dataset");
+	ImGui::Text("Number loaded training images: %i", training_set.size());
+	ImGui::Text("Number loaded test images: %i", test_set.size());
+	ImGui::End();
+
+	/*if (training_load_state == LS_COMPLETED_SUCCESFULY && test_load_state == LS_COMPLETED_SUCCESFULY)
+	{
+		ImGui::Begin("Dataset Test");
+
+		ImGui::Image((ImTextureID)test_set.front()->GetTexture(), ImVec2(200,200));
+		ImGui::Text("%i",test_set.front()->GetLabel());
+		std::stringstream ss;
+		Eigen::IOFormat fmt;
+		Eigen::MatrixXd image = test_set.front()->GetImage();
+		for (int i = 0; i < image.rows(); i++)
+		{
+			for (int j = 0; j < image.cols(); j++)
+			{
+				if (image(i, j) > 0.00)
+				{
+					image(i, j) = 1;
+				}
+			}
+		}
+		ss << image.format(fmt);
+		ImGui::Text(ss.str().c_str());
+
+		ImGui::Image((ImTextureID)test_set.back()->GetTexture(), ImVec2(200, 200));
+		ImGui::Text("%i", test_set.back()->GetLabel());
+		std::stringstream ss2;
+		const Eigen::MatrixXd& image = test_set.back()->GetImage();
+		ss2 << image.format(fmt);
+		ImGui::Text(ss2.str().c_str());
+
+		ImGui::Image((ImTextureID)training_set.front()->GetTexture(), ImVec2(200, 200));
+		ImGui::Text("%i", training_set.front()->GetLabel());
+		std::stringstream ss3;
+		ss3<< training_set.front()->GetImage().format(fmt);
+		ImGui::Text(ss3.str().c_str());
+
+		ImGui::Image((ImTextureID)training_set.back()->GetTexture(), ImVec2(200, 200));
+		ImGui::Text("%i", training_set.back()->GetLabel());
+		std::stringstream ss4;
+		ss4 << training_set.back()->GetImage().format(fmt);
+		ImGui::Text(ss4.str().c_str());
+
+		ImGui::End();
+	}*/
+
 	return true;
 }
 
@@ -46,11 +90,23 @@ bool Dataset::PostUpdate()
 		std::cerr << "Dataset - Training dataset load failed" << std::endl;
 		return false;
 	}
+	else if (training_load_state == LS_COMPLETED_SUCCESFULY && training_load_thread != nullptr)
+	{
+		training_load_thread->join();
+		delete training_load_thread;
+		training_load_thread = nullptr;
+	}
 
 	if (test_load_state == LS_COMPLETED_WITH_ERRORS)
 	{
 		std::cerr << "Dataset - Test dataset load failed" << std::endl;
 		return false;
+	}
+	else if (test_load_state == LS_COMPLETED_SUCCESFULY && test_load_thread != nullptr)
+	{
+		test_load_thread->join();
+		delete test_load_thread;
+		test_load_thread = nullptr;
 	}
 
 	return true;
@@ -66,6 +122,21 @@ bool Dataset::CleanUp()
 	for (std::vector<MNIST*>::iterator it = test_set.begin(); it != test_set.end(); it++)
 	{
 		delete (*it);
+	}
+
+	// In case loading is not finished
+	if (training_load_thread != nullptr)
+	{
+		training_load_thread->join();
+		delete training_load_thread;
+		training_load_thread = nullptr;
+	}
+
+	if (test_load_thread != nullptr)
+	{
+		test_load_thread->join();
+		delete test_load_thread;
+		test_load_thread = nullptr;
 	}
 
 	return true;

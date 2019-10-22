@@ -1,5 +1,46 @@
 #include "FullyConnectedNode.h"
 
+#include "imgui.h"
+
+FullyConnectedNode::FullyConnectedNode(std::mt19937 & engine, int num_neurons, int num_connections):
+	ComputationNode(NT_FULLY_CONNECTED),
+	weights(num_neurons, num_connections),
+	biases(num_neurons, 1)
+{
+	// Weigths
+	std::normal_distribution<double> distribution_weights(0.0, 1.0 / sqrt(num_connections));
+
+	for (int i = 0; i < num_neurons; i++)
+	{
+		for (int j = 0; j < num_connections; j++)
+		{
+			weights(i, j) = distribution_weights(engine);
+		}
+	}
+
+	// Biases
+	std::normal_distribution<double> distribution_biases(0.0, 1.0);
+
+	for (int i = 0; i < biases.rows(); i++)
+	{
+		biases(i, 0) = distribution_biases(engine);
+	}
+
+	// Debug
+	/*for (int i = 0; i < num_neurons; i++)
+	{
+		for (int j = 0; j < num_connections; j++)
+		{
+			weights(i, j) = 0.5;
+		}
+	}
+
+	for (int i = 0; i < biases.rows(); i++)
+	{
+		biases(i, 0) = 0.5;
+	}*/
+}
+
 FullyConnectedNode::FullyConnectedNode(const Eigen::MatrixXd& weights, const Eigen::MatrixXd& biases):
 	ComputationNode(NT_FULLY_CONNECTED),
 	weights(weights),
@@ -9,16 +50,14 @@ FullyConnectedNode::FullyConnectedNode(const Eigen::MatrixXd& weights, const Eig
 FullyConnectedNode::~FullyConnectedNode()
 {}
 
-void FullyConnectedNode::Forward(const Eigen::VectorXd & input, Eigen::VectorXd & output) const
+void FullyConnectedNode::Forward(Eigen::VectorXd & input) const
 {
-	output = weights * input + biases;
+	input = weights * input + biases;
 }
 
-void FullyConnectedNode::Backward(const Eigen::VectorXd & input, const Eigen::VectorXd & gradient, Eigen::VectorXd & output)
+void FullyConnectedNode::Backward(const Eigen::VectorXd & input, Eigen::VectorXd & gradient)
 {
-	// TODO test cus chain rule sais one and expirience sais the other
-	//return weights.transpose() * derivative;
-	output = weights.transpose() * gradient;
+	gradient = weights.transpose() * gradient;
 }
 
 void FullyConnectedNode::UpdateWeightsAndBiases(const Eigen::MatrixXd & gradient, const Eigen::MatrixXd & input, float training_rate)
@@ -48,4 +87,14 @@ void FullyConnectedNode::UpdateWeightsAndBiasesRegular(const Eigen::MatrixXd & g
 
 	biases -= (eta / mini_batch_size) * gradient;
 	weights -= (1 - eta * (lambda / weights.size())) * (eta / mini_batch_size) * (gradient * input.transpose());
+}
+
+bool FullyConnectedNode::UINode() const
+{
+	return ImGui::Button("Fully\nConnected\nNode", BUTTON_SIZE);
+}
+
+void FullyConnectedNode::UIDescription() const
+{
+	ImGui::TextWrapped("Fully connected nodes provide an array of neurons all connected to each input.");
 }

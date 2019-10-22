@@ -8,7 +8,7 @@
 #define TRAINING_PERCENTAGE 5.0f/6.0f
 #define VALIDATION_PERCENTAGE 1.0f/6.0f
 
-#define INPUT_LAYER 784 // 28 * 28
+#define IMAGE_SIZE 784 // 28 * 28
 #define NUM_HIDDEN_LAYERS 1
 #define HIDDEN_LAYER_1 30
 #define HIDDEN_LAYER_2 0
@@ -18,5 +18,7 @@
 #define MINI_BATCH_SIZE 25
 #define REGULARIZATION_PARAMETER 5.0f
 #define EPOCHS 10
+
+#define POOLING_WINDOW 4
 
 #endif //!GLOBALS

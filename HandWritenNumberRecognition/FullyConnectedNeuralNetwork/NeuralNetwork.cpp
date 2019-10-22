@@ -155,7 +155,8 @@ void NeuralNetwork::SGD(const std::vector<MNIST*>& training_data, int epochs, in
 		}
 
 		// Train with minibatch
-		UpdateWithMiniBatch(mini_batch, eta, lambda);
+		//UpdateWithMiniBatch(mini_batch, eta, lambda);
+		DebugUpdateWithMiniBatch(mini_batch);
 
 		// Test
 		TestOnValidation();
@@ -164,6 +165,158 @@ void NeuralNetwork::SGD(const std::vector<MNIST*>& training_data, int epochs, in
 	}
 
 	state = S_DONE;
+}
+
+const Eigen::VectorXd & NeuralNetwork::DebugFeedForward(const Eigen::VectorXd & input)
+{
+	std::cerr << "FEED FORWARD:" << std::endl;
+
+	Eigen::IOFormat fmt;
+	std::cerr << "Layer 0 input:" << input.format(fmt) << std::endl;
+	std::cerr << "Layer 0 weights:" << layers[0]->GetWeights().format(fmt) << std::endl;
+	std::cerr << "Layer 0 biases:" << layers[0]->GetBiases().format(fmt) << std::endl;
+
+	// Feed forward every layer /w the last layer's activations (input for the first layer)
+	const Eigen::VectorXd* last_layer_activation = &layers.front()->FeedForward(input);
+
+	//std::cerr << "First(0) activation:" << last_layer_activation->format(fmt) << std::endl;
+
+	for (int i = 1; i < layers.size(); i++)
+	{
+		std::cerr << "Layer" << i << " input:" << last_layer_activation->format(fmt) << std::endl;
+		std::cerr << "Layer" << i << " weights:" << layers[i]->GetWeights().format(fmt) << std::endl;
+		std::cerr << "Layer" << i << " biases:" << layers[i]->GetBiases().format(fmt) << std::endl;
+		last_layer_activation = &layers[i]->FeedForward(*last_layer_activation);
+
+		//std::cerr << "Layer" << i << " activation:" << last_layer_activation->format(fmt) << std::endl;
+	}
+
+	return *last_layer_activation;
+}
+
+void NeuralNetwork::DebugBackPropagation(const Eigen::VectorXd & error, const Eigen::VectorXd & input, float eta, int mini_batch_size, float lambda)
+{
+	std::cerr << "BACK PROP:" << std::endl;
+
+	/*
+	Back propagate the error from each layer to the previous until we go from output to imput.
+	We collect each layer's error to later use to update weights and biases
+	*/
+
+	std::vector<Eigen::VectorXd> layer_errors;
+	layer_errors.reserve(layers.size());
+
+	// Output layer's error is the overall error
+	layer_errors.push_back(error);
+
+	Eigen::IOFormat fmt;
+	//std::cerr << "overall error:" << error.format(fmt) << std::endl;
+
+	for (int i = layers.size() - 2; i >= 0; i--)
+	{
+		Eigen::VectorXd last_layer_error = layer_errors.back();
+		//std::cerr << "layer" << i << " last layer activations:" << last_layer_error.format(fmt) << std::endl;
+
+		Eigen::MatrixXd prev_weights = layers[i + 1]->GetWeights();
+		//std::cerr << "layer" << i << " last layer weights:" << prev_weights.format(fmt) << std::endl;
+
+		std::cerr << "Layer" << i - 1 << " error:" << last_layer_error.format(fmt) << std::endl;
+		std::cerr << "Layer" << i << " input:" << prev_weights.format(fmt) << std::endl;
+
+		Eigen::VectorXd error = layers[i]->BackPropagate(last_layer_error, prev_weights);
+		//std::cerr << "layer" << i << " error:" << error.format(fmt) << std::endl;
+
+		layer_errors.push_back(error);
+	}
+
+	/*
+	We update each layer's weights & biases after back propagating the error all the way,
+	otherwise the weights used to compute a layer's error would have already been changed when
+	back propagating the other layers closer to the output
+	*/
+
+	// No regularization 
+	//if (lambda < 0.00001f)
+	//{
+
+	/*std::cerr << "UPDATE:" << std::endl;
+
+	std::vector<Eigen::VectorXd>::iterator err = layer_errors.begin();
+	int current_layer = layers.size() - 1;
+
+	for (; current_layer > 0; err++, current_layer--)
+	{
+		std::cerr << "layer" << current_layer << " error:" << error.format(fmt) << std::endl;
+
+		Eigen::VectorXd previous_layer_activation = layers[current_layer - 1]->GetActivation();
+		std::cerr << "Previous layer activation: " << previous_layer_activation.format(fmt) << std::endl;
+
+		layers[current_layer]->UpdateWeightsAndBiases(*err, previous_layer_activation, eta / mini_batch_size);
+	}
+
+	// Update first layer with input as activations
+	std::cerr << "first layer error:" << layer_errors.back().format(fmt) << std::endl;
+
+	Eigen::VectorXd previous_layer_activation = input;
+	std::cerr << "Previous layer activation: " << input.format(fmt) << std::endl;
+
+	layers.front()->UpdateWeightsAndBiases(layer_errors.back(), input, eta / mini_batch_size);*/
+	//}
+	// L2 Regularization
+	/*else
+	{
+		std::vector<Eigen::VectorXd>::iterator err = layer_errors.begin();
+		std::vector<Layer*>::reverse_iterator current_layer = layers.rbegin();
+		std::vector<Layer*>::reverse_iterator previous_layer = current_layer + 1;
+
+		for (; previous_layer != layers.rend(); current_layer++, err++, previous_layer++)
+		{
+			(*current_layer)->UpdateWeightsAndBiasesRegular(*err, (*previous_layer)->GetActivation(), eta, mini_batch_size, lambda);
+		}
+
+		// Update first layer with input as activations
+		layers.front()->UpdateWeightsAndBiasesRegular(layer_errors.back(), input, eta, mini_batch_size, lambda);
+	}*/
+}
+
+void NeuralNetwork::Debug()
+{
+	// Feed forward
+	Eigen::VectorXd image(16);
+
+	image <<
+		1.0, 1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0, 1.0;
+
+	const Eigen::VectorXd& activation = DebugFeedForward(image);
+
+	// Desired outcome
+	Eigen::VectorXd desired(Eigen::VectorXd::Zero(activation.rows()));
+	desired[1] = 1.0;
+
+	Eigen::IOFormat fmt;
+	std::cerr << "Final output: " << activation.format(fmt) << std::endl;
+	std::cerr << "\n\nDesired outcome: " << desired.format(fmt) << std::endl;
+
+	/*
+	This first(last) layer's error is calculated by multiplying the cost derivative in regards to activation (the
+	variation of cost in with regards to each activation cost) by the variation of the activation function in that neuron's
+	Z (sigmoid prime of z)
+	To compute this better we create a diagonal matrix with the values resulting from sigmoid prime of Z and multiply it by
+	the cost derivative resulting vector
+	*/
+
+	Eigen::MatrixXd sigmoid_prime_z(layers.back()->GetZ().unaryExpr(&FullyConnectedLayer::SigmoidPrime).asDiagonal());
+
+	Eigen::VectorXd delta = sigmoid_prime_z * Quadratic(activation, desired);
+
+	std::cerr << "Cost: " << Quadratic(activation, desired) << std::endl;
+	std::cerr << "Overall error: " << delta.format(fmt) << std::endl;
+
+	// With the first layers error we can back propagate and get the next layer's error as well as change its weights and biases
+	DebugBackPropagation(delta, image, 1.0f, 1.0, 1.0f);
 }
 
 void NeuralNetwork::UpdateWithMiniBatch(std::vector<MNIST*>& mini_batch, float eta, float lambda)
@@ -192,6 +345,41 @@ void NeuralNetwork::UpdateWithMiniBatch(std::vector<MNIST*>& mini_batch, float e
 
 		// With the first layers error we can back propagate and get the next layer's error as well as change its weights and biases
 		BackPropagation(delta, image, eta, mini_batch.size(), lambda);
+	}
+}
+
+void NeuralNetwork::DebugUpdateWithMiniBatch(std::vector<MNIST*>& mini_batch)
+{
+	for (std::vector<MNIST*>::iterator it = mini_batch.begin(); it != mini_batch.end(); it++)
+	{
+		// Feed forward
+		const Eigen::VectorXd& image((*it)->GetImage());
+		const Eigen::VectorXd& activation = DebugFeedForward(image);
+
+		// Desired outcome
+		Eigen::VectorXd desired(Eigen::VectorXd::Zero(activation.rows()));
+		desired[(*it)->GetLabel()] = 1.0;
+
+		Eigen::IOFormat fmt;
+		std::cerr << "\n\nDesired outcome: " << desired.format(fmt) << std::endl;
+
+		/*
+		This first(last) layer's error is calculated by multiplying the cost derivative in regards to activation (the
+		variation of cost in with regards to each activation cost) by the variation of the activation function in that neuron's
+		Z (sigmoid prime of z)
+		To compute this better we create a diagonal matrix with the values resulting from sigmoid prime of Z and multiply it by
+		the cost derivative resulting vector
+		*/
+
+		Eigen::MatrixXd sigmoid_prime_z(layers.back()->GetZ().unaryExpr(&FullyConnectedLayer::SigmoidPrime).asDiagonal());
+
+		Eigen::VectorXd delta = sigmoid_prime_z * Quadratic(activation, desired);
+
+		std::cerr << "Cost: " << Quadratic(activation, desired) << std::endl;
+		std::cerr << "Overall error: " << delta.format(fmt) << std::endl;
+
+		// With the first layers error we can back propagate and get the next layer's error as well as change its weights and biases
+		DebugBackPropagation(delta, image, 1.0f, mini_batch.size(), 1.0f);
 	}
 }
 

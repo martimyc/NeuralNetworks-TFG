@@ -1,39 +1,43 @@
 #include "TanhNode.h"
 
+#include "imgui.h"
+
 TanhNode::TanhNode(): ComputationNode(NT_TANH)
 {}
 
 TanhNode::~TanhNode()
 {}
 
-void TanhNode::Forward(const Eigen::VectorXd & input, Eigen::VectorXd & output) const
+void TanhNode::Forward(Eigen::VectorXd & input) const
 {
-	output = input.unaryExpr(&Tanh);
+	input = input.unaryExpr(&Tanh);
 }
 
-void TanhNode::Backward(const Eigen::VectorXd & input, const Eigen::VectorXd & gradient, Eigen::VectorXd & output)
+void TanhNode::Backward(const Eigen::VectorXd & input, Eigen::VectorXd & gradient)
 {
-	output = input.unaryExpr(&Derivative).asDiagonal() * gradient;
+	gradient = input.unaryExpr(&Derivative).asDiagonal() * gradient;
 }
 
-void TanhNode::Forward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& output) const
+void TanhNode::Forward(std::vector<Eigen::MatrixXd>& inputs) const
 {
-	output.reserve(inputs.size());
-	for (std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin(); input != inputs.end(); input++)
+	for (std::vector<Eigen::MatrixXd>::iterator input = inputs.begin(); input != inputs.end(); input++)
 	{
-		output.push_back(input->unaryExpr(&Tanh));
+		*input = input->unaryExpr(&Tanh);
 	}
 }
 
-void TanhNode::Backward(const std::vector<Eigen::MatrixXd>& inputs, const std::vector<Eigen::MatrixXd>& gradients, std::vector<Eigen::MatrixXd>& output)
+void TanhNode::Backward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& gradients)
 {
-	output.reserve(inputs.size());
+	std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin();
+	std::vector<Eigen::MatrixXd>::iterator gradient = gradients.begin();
+	for (; input != inputs.end(); input++, gradient++)
 	{
-		std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin();
-		std::vector<Eigen::MatrixXd>::const_iterator gradient = gradients.begin();
-		for (; input != inputs.end(); input++, gradient++)
+		for (int i = 0; i < input->rows(); i++)
 		{
-			output.push_back(input->unaryExpr(&Derivative).asDiagonal() * (*gradient));
+			for (int j = 0; j < input->cols(); j++)
+			{
+				(*gradient)(i, j) = Derivative((*input)(i, j)) * (*gradient)(i, j);
+			}
 		}
 	}
 }
@@ -46,4 +50,15 @@ double TanhNode::Tanh(double input)
 double TanhNode::Derivative(double input)
 {
 	return 1.0 - Tanh(input) * Tanh(input);
+}
+
+bool TanhNode::UINode() const
+{
+	return ImGui::Button("Tahn\nNode", BUTTON_SIZE);
+}
+
+void TanhNode::UIDescription() const
+{
+	ImGui::TextWrapped("Applies the Tanh activation function.");
+	// TODO ImGui::Image();
 }

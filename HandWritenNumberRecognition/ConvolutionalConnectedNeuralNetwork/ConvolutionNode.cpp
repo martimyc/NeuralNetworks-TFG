@@ -2,18 +2,44 @@
 
 #include <iostream>
 
-ConvolutionNode::ConvolutionNode(std::vector<ConvolutionNode::Kernel>& kernels): ConvolutionLayerNode(), ComputationNode(NT_CONVOLUTION), kernels(kernels)
-{}
+#include "imgui.h"
 
-ConvolutionNode::ConvolutionNode(ConvolutionNode::Kernel & kernel): ConvolutionLayerNode(), ComputationNode(NT_CONVOLUTION), kernels()
+ConvolutionNode::ConvolutionNode(std::mt19937 & engine, int k_size, int num_filters): ConvolutionLayerNode(), ComputationNode(NT_CONVOLUTION), kernels(kernels)
 {
-	kernels.push_back(kernel);
+	for (int i = 0; i < num_filters; i++)
+	{
+		kernels.push_back(Kernel(k_size));
+		Kernel& kernel = kernels.back();
+		std::normal_distribution<double> distribution(0.0, 1.0);
+
+		// Weigths
+		for (int i = 0; i < k_size; i++)
+		{
+			for (int j = 0; j < k_size; j++)
+			{
+				kernel.weights(i, j) = distribution(engine);
+			}
+		}
+
+		// Bias
+		kernel.bias = distribution(engine);
+
+		// Debug
+		/*for (int i = 0; i < k_size; i++)
+		{
+			for (int j = 0; j < k_size; j++)
+			{
+				kernel.weights(i, j) = 0.5;
+			}
+		}
+		kernel.bias = 0.5;*/
+	}
 }
 
 ConvolutionNode::~ConvolutionNode()
 {}
 
-void ConvolutionNode::Forward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& output) const
+void ConvolutionNode::Forward(std::vector<Eigen::MatrixXd>& inputs) const
 {
 	if (kernels.size() == 0)
 	{
@@ -21,17 +47,17 @@ void ConvolutionNode::Forward(const std::vector<Eigen::MatrixXd>& inputs, std::v
 		return;
 	}
 
-	output.reserve(kernels.size() * inputs.size());
+	std::vector<Eigen::MatrixXd> outputs;
 
-	for (std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin(); input != inputs.end(); input++)
+	for (std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin(); input != inputs.end(); input++) // Iterate diferent images
 	{
-		for (std::vector<Kernel>::const_iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++)
+		for (std::vector<Kernel>::const_iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++) // Iterate diferent kernels
 		{
 			int rows = input->rows() - kernel->Rows() + 1;
 			int cols = input->cols() - kernel->Cols() + 1;
 
-			output.push_back(Eigen::MatrixXd(rows, cols));
-			Eigen::MatrixXd& mat = output.back();
+			outputs.push_back(Eigen::MatrixXd(rows, cols));
+			Eigen::MatrixXd& mat = outputs.back();
 
 			for (int i = 0; i < rows; i++)
 			{
@@ -42,65 +68,80 @@ void ConvolutionNode::Forward(const std::vector<Eigen::MatrixXd>& inputs, std::v
 			}
 		}
 	}
+
+	// Fill inputs
+	inputs.clear();
+	for (std::vector<Eigen::MatrixXd>::const_iterator output = outputs.begin(); output != outputs.end(); output++) // Iterate diferent images
+	{
+		inputs.push_back(*output);
+	}
 }
 
-void ConvolutionNode::Backward(const std::vector<Eigen::MatrixXd>& inputs, const std::vector<Eigen::MatrixXd>& gradients, std::vector<Eigen::MatrixXd>& output)
+void ConvolutionNode::Backward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& gradients)
 {
-	output.reserve(inputs.size());
+	std::vector<Eigen::MatrixXd> outputs;
+	outputs.reserve(inputs.size());
 
+	std::vector<Eigen::MatrixXd>::iterator gradient = gradients.begin();
+	std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin();
+
+	for (; input != inputs.end(); input++)
 	{
-		std::vector<Eigen::MatrixXd>::const_iterator gradient = gradients.begin();
+		outputs.push_back(Eigen::MatrixXd::Zero(input->rows(), input->cols()));
+		Eigen::MatrixXd output = outputs.back();
 
-		for (std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin(); input != inputs.end(); input++, gradient++)
+		for (std::vector<Kernel>::const_iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++, gradient++)
 		{
-			for (std::vector<Kernel>::const_iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++, gradient++)
+			int rows = gradient->rows();
+			int cols = gradient->cols();
+
+			Eigen::MatrixXd mat(input->rows(), input->cols());
+
+			for (int i = 0; i < rows; i++)
 			{
-				int rows = gradient->rows();
-				int cols = gradient->cols();
-
-				output.push_back(Eigen::MatrixXd(rows, cols));
-				Eigen::MatrixXd& mat = output.back();
-
-				for (int i = 0; i < rows; i++)
+				for (int j = 0; j < cols; j++)
 				{
-					for (int j = 0; j < cols; j++)
-					{
-						ComputeBackwardPixel(i, j, *gradient, *input, *kernel, mat);
-					}
+					ComputeBackwardPixel(i, j, *gradient, *input, *kernel, mat);
 				}
 			}
+			output += mat;
 		}
+	}
+	gradients.clear();
+	gradients.reserve(outputs.size());
+
+	for (std::vector<Eigen::MatrixXd>::iterator output = outputs.begin(); output != outputs.end(); output++)
+	{
+		gradients.push_back(*output);
 	}
 }
 
 void ConvolutionNode::UpdateWeightsAndBiases(const std::vector<Eigen::MatrixXd> & gradients, const std::vector<Eigen::MatrixXd> & inputs, float training_rate)
 {
-	// CHEK
+	std::vector<Eigen::MatrixXd>::const_iterator gradient = gradients.begin();
+	std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin();
+
+	for (; input != inputs.end(); input++)
 	{
-		std::vector<Eigen::MatrixXd>::const_iterator gradient = gradients.begin();
-
-		for (std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin(); input != inputs.end(); input++, gradient++)
+		for (std::vector<Kernel>::iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++, gradient++)
 		{
-			for (std::vector<Kernel>::iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++, gradient++)
+			int rows = gradient->rows();
+			int cols = gradient->cols();
+
+			Eigen::MatrixXd weight_gradient(kernel->Rows(), kernel->Cols());
+			double bias_gradient = 0.0;
+
+			for (int i = 0; i < rows; i++)
 			{
-				int rows = gradient->rows();
-				int cols = gradient->cols();
-
-				Eigen::MatrixXd weight_gradient(kernel->Rows(), kernel->Cols());
-				double bias_gradient = 0.0;
-
-				for (int i = 0; i < rows; i++)
+				for (int j = 0; j < cols; j++)
 				{
-					for (int j = 0; j < cols; j++)
-					{
-						ComputeWeightGradient(i, j, *gradient, *input, *kernel, weight_gradient);
-						bias_gradient += (*gradient)(i,j);
-					}
+					ComputeWeightGradient(i, j, *gradient, *input, *kernel, weight_gradient);
+					bias_gradient += (*gradient)(i,j);
 				}
-
-				kernel->weights -= weight_gradient * training_rate;
-				kernel->bias -= bias_gradient * training_rate;
 			}
+
+			kernel->weights -= weight_gradient * training_rate;
+			kernel->bias -= bias_gradient * training_rate;
 		}
 	}
 }
@@ -108,33 +149,42 @@ void ConvolutionNode::UpdateWeightsAndBiases(const std::vector<Eigen::MatrixXd> 
 void ConvolutionNode::UpdateWeightsAndBiasesRegular(const std::vector<Eigen::MatrixXd> & gradients, const std::vector<Eigen::MatrixXd> & inputs, float eta, int mini_batch_size, float lambda)
 {
 	// CHEK
+	std::vector<Eigen::MatrixXd>::const_iterator gradient = gradients.begin();
+	std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin();
+
+	for (; input != inputs.end(); input++, gradient++)
 	{
-		std::vector<Eigen::MatrixXd>::const_iterator gradient = gradients.begin();
-
-		for (std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin(); input != inputs.end(); input++, gradient++)
+		for (std::vector<Kernel>::iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++, gradient++)
 		{
-			for (std::vector<Kernel>::iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++, gradient++)
+			int rows = gradient->rows();
+			int cols = gradient->cols();
+
+			Eigen::MatrixXd weight_gradient(kernel->Rows(), kernel->Cols());
+			double bias_gradient = 0.0;
+
+			for (int i = 0; i < rows; i++)
 			{
-				int rows = gradient->rows();
-				int cols = gradient->cols();
-
-				Eigen::MatrixXd weight_gradient(kernel->Rows(), kernel->Cols());
-				double bias_gradient = 0.0;
-
-				for (int i = 0; i < rows; i++)
+				for (int j = 0; j < cols; j++)
 				{
-					for (int j = 0; j < cols; j++)
-					{
-						ComputeWeightGradient(i, j, *gradient, *input, *kernel, weight_gradient);
-						bias_gradient += (*gradient)(i, j);
-					}
+					ComputeWeightGradient(i, j, *gradient, *input, *kernel, weight_gradient);
+					bias_gradient += (*gradient)(i, j);
 				}
-
-				kernel->weights -= (1 - eta * (lambda / kernel->weights.size())) * (eta / mini_batch_size) * weight_gradient;
-				kernel->bias -= (eta / mini_batch_size) * bias_gradient;
 			}
+
+			kernel->weights -= (1 - eta * (lambda / kernel->weights.size())) * (eta / mini_batch_size) * weight_gradient;
+			kernel->bias -= (eta / mini_batch_size) * bias_gradient;
 		}
 	}
+}
+
+bool ConvolutionNode::UINode() const
+{
+	return ImGui::Button("Convolution\nNode", BUTTON_SIZE);
+}
+
+void ConvolutionNode::UIDescription() const
+{
+	ImGui::TextWrapped("Convolution nodes apply a wheighted filter on an input matrix.\nThis is similar to how the visual cortex proceses images.\nVery usefull in image recognition.");
 }
 
 double ConvolutionNode::ComputeForwardPixel(int x, int y, const Kernel& kernel, const Eigen::MatrixXd & input) const
@@ -148,7 +198,10 @@ void ConvolutionNode::ComputeBackwardPixel(int x, int y, const Eigen::MatrixXd &
 	{
 		for (int j = 0; j < kernel.Cols(); j++)
 		{
-			// Maybe no input cus derivative of Ax = A?
+			if (x + i >= input.rows() || y + j >= input.cols())
+			{
+				continue;
+			}
 			output(x + i, y + j) += gradient(x, y) * kernel.weights(i, j) * input(x + i, y + j);
 		}
 	}
@@ -160,6 +213,10 @@ void ConvolutionNode::ComputeWeightGradient(int x, int y, const Eigen::MatrixXd 
 	{
 		for (int j = 0; j < kernel.Rows(); j++)
 		{
+			if (x + i >= input.rows() || y + j >= input.cols())
+			{
+				continue;
+			}
 			output(i,j) = gradient(x, y) * kernel.Weights()(i, j) * input(x + i, y + j);
 		}
 	}

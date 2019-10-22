@@ -14,7 +14,7 @@ public:
 
 	// Setters & Getters
 	const GLuint& GetTexture();
-	inline const Eigen::VectorXd& GetImage() const { return pixels; } // TODO change to MatrixXd
+	inline const Eigen::MatrixXd& GetImage() const { return pixels; }
 	inline int GetLabel() const { return label; }
 
 	// Load
@@ -25,7 +25,7 @@ private:
 	void InitTexture();
 
 private:
-	Eigen::VectorXd pixels; // TODO change to MatrixXd
+	Eigen::MatrixXd pixels;
 	int label;
 	int width;
 	int height;

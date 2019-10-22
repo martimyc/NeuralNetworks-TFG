@@ -10,8 +10,10 @@
 #include "Application.h"
 #include "Datasets.h"
 #include "MNIST.h"
+#include "Layer.h"
+#include "ConvolutionLayer.h"
 
-ML::ML() : Module("ML"), network(nullptr), training_thread(nullptr), training_sesion(0), rand_device(), engine(rand_device())
+ML::ML() : Module("ML"), network(nullptr), training_thread(nullptr), training_sesion(0)
 {}
 
 ML::~ML()
@@ -20,10 +22,26 @@ ML::~ML()
 bool ML::Init()
 {
 	// Initialize NN
-	network = new NeuralNetwork(CF_QUADRATIC, false);
+	network = new NeuralNetwork(CF_CROSS_ENTHROPY, true);
 	
-	AddFullyConnectedLayer(30, INPUT_LAYER);
-	AddFullyConnectedLayer(10, 30);
+	//network->AddFullyConnectedLayer(30, INPUT_LAYER, AF_SIGMOID, false);
+	//network->AddFullyConnectedLayer(10, 30, AF_SOFTMAX, false);
+
+	// Convolutional
+	ConvolutionLayer* conv_layer = network->AddConvolutionLayer(4, P_MAX, AF_RELU, 4, IMAGE_SIZE);
+	conv_layer = network->AddConvolutionLayer(4, P_MAX, AF_RELU, 4, conv_layer->GetOutputImageSize());
+
+	// Fully Connected
+	// neurons to fully connect
+	// Image size of last layer * number of filters of layers before (4 in the first 4 in the second)
+	int num_neurons = conv_layer->GetOutputImageSize() * 4 * 4; 
+
+	network->AddFullyConnectedLayer(30, num_neurons, AF_SIGMOID);
+	network->AddFullyConnectedLayer(10, 30, AF_SIGMOID);
+
+	// Debug
+	//network->AddFullyConnectedLayer(30, 4*4, AF_SIGMOID, false);
+	//network->AddFullyConnectedLayer(10, 30, AF_SIGMOID, false);
 
 	output = -1;
 
@@ -44,7 +62,7 @@ bool ML::Update()
 {
 	ImGui::Begin("Neural Network Info");
 
-	if (ImGui::TreeNodeEx("Training", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::TreeNodeEx("Training", ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed))
 	{
 		ImGui::Text("Training Sesion %i", training_sesion);
 
@@ -59,16 +77,17 @@ bool ML::Update()
 		ImGui::TreePop();
 	}
 
-	if (ImGui::TreeNodeEx("Network", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::TreeNodeEx("Network", ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed))
 	{
 		network->Info();
 
 		ImGui::TreePop();
 	}
 
-	if (!training && App->dataset->LoadingDone())
+	ImGui::End();
+
+	if (training_thread == nullptr && App->dataset->LoadingDone())
 	{
-		training = true;
 		training_sesion++;
 		training_thread = new std::thread(&NeuralNetwork::SGD, std::ref(*network), App->dataset->GetTrainingSet(), EPOCHS, MINI_BATCH_SIZE, TRAINING_RATE, REGULARIZATION_PARAMETER);
 	}
@@ -78,10 +97,11 @@ bool ML::Update()
 		training_thread->join();
 		delete training_thread;
 		training_thread = nullptr;
-		training = false;
 	}
 
-	ImGui::End();
+	/*network->DebugConvolution();
+	network->DebugLayer();
+	network->Debug();*/
 
 	return true;
 }
@@ -98,36 +118,9 @@ bool ML::CleanUp()
 		training_thread->join();
 		delete training_thread;
 		training_thread = nullptr;
-		training = false;
 	}
 
 	delete network;
 
 	return true;
-}
-
-void ML::AddFullyConnectedLayer(int num_neurons, int num_previous_layer_neurons)
-{
-	// Weigths
-	std::normal_distribution<double> distribution_weights(0.0, 1.0 / sqrt(num_previous_layer_neurons));
-	Eigen::MatrixXd weights(num_neurons, num_previous_layer_neurons);
-
-	for (int i = 0; i < weights.rows(); i++)
-	{
-		for (int j = 0; j < weights.cols(); j++)
-		{
-			weights(i, j) = distribution_weights(engine);
-		}
-	}
-
-	// Biases
-	std::normal_distribution<double> distribution_biases(0.0, 1.0);
-	Eigen::MatrixXd biases(num_neurons, 1);
-
-	for (int i = 0; i < biases.rows(); i++)
-	{
-		weights(i, 1) = distribution_biases(engine);
-	}
-
-	//TODO
 }

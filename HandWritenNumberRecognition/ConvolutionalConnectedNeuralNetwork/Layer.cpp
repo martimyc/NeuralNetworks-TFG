@@ -25,7 +25,7 @@ FullyConnectedLayer * Layer::AsFullyConnected()
 
 ConvolutionLayer * Layer::AsConvolution()
 {
-	if (type != LT_FULLY_CONNECTED)
+	if (type != LT_CONVOLUTION)
 	{
 		std::cerr << "Layer - AsConvolution - Layer is not convolution layer" << std::endl;
 		return nullptr;

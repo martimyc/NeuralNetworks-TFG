@@ -1,4 +1,3 @@
-#include "..\ConvolutionalConnectedNeuralNetwork\Layer.h"
 #include "Layer.h"
 
 #include <iostream>

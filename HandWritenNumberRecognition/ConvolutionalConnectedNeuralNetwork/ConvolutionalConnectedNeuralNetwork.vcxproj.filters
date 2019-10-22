@@ -75,6 +75,9 @@
     <ClCompile Include="Layer.cpp">
       <Filter>Layer</Filter>
     </ClCompile>
+    <ClCompile Include="SoftMaxNode.cpp">
+      <Filter>ComputationalNodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
@@ -405,6 +408,9 @@
     </ClInclude>
     <ClInclude Include="FullyConnectedLayerNode.h">
       <Filter>ComputationalNodes\Polimorphism</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftMaxNode.h">
+      <Filter>ComputationalNodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,25 +1,44 @@
 #include "FullyConnectedLayer.h"
 
 #include <math.h>
+#include <iostream>
+
+#include "imgui.h"
 
 #include "NeuralNetwork.h"
 
 //Nodes
 #include "FullyConnectedNode.h"
+#include "ReluNode.h"
+#include "SigmoidNode.h"
+#include "TanhNode.h"
+#include "SoftMaxNode.h"
 
-FullyConnectedLayer::FullyConnectedLayer(int layer_neurons, int previous_layer_neurons, bool regularization) :
+FullyConnectedLayer::FullyConnectedLayer(int layer_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool regularization) :
 	Layer(LT_FULLY_CONNECTED, regularization),
 	num_neurons(layer_neurons),
-	num_weights(previous_layer_neurons)
+	num_weights(previous_layer_neurons),
+	focused(nullptr)
 {
-	// TODO init nodes
-	// Random initialization
+	AddFullyConnectedNode(layer_neurons, previous_layer_neurons);
 
+	switch (activation_funct)
+	{
+	case AF_SIGMOID: AddSigmoidNode(); break;
+	case AF_RELU: AddReluNode(); break;
+	case AF_TANH: AddTanhNode(); break;
+	case AF_SOFTMAX: AddSoftMaxNode(); break;
+	default:
+		std::cerr << "FullyConnectedLayer - Constructor - Unidentified activation function" << std::endl;
+		break;
+	}
+
+	focused = nodes.front();
 }
 
 FullyConnectedLayer::~FullyConnectedLayer()
 {
-	for (std::vector<FullyConnectedLayerNode*>::iterator node = nodes.begin(); node != nodes.end(); node++)
+	for (std::vector<FullyConnectedLayerNode*>::reverse_iterator node = nodes.rbegin(); node != nodes.rend(); node++)
 	{
 		delete *node;
 	}
@@ -39,22 +58,22 @@ const Eigen::MatrixXd FullyConnectedLayer::FeedForward(const Eigen::MatrixXd& in
 		return Eigen::MatrixXd();
 	}
 
-	Eigen::VectorXd input_vec(input.size());
+	Eigen::VectorXd input_vec(input.rows() * input.cols());
 
 	MatToVec(input, input_vec);
 
-	Eigen::VectorXd output_vec;
-
 	for (std::vector<FullyConnectedLayerNode*>::const_iterator node = nodes.begin(); node != nodes.end(); node++)
 	{
-		(*node)->Forward(input_vec, output_vec);
-		inputs.push_back(output_vec);
-		input_vec = output_vec;
+		// Save Input
+		inputs.push_back(input_vec);
+
+		// Compute and update vec
+		(*node)->Forward(input_vec);
 	}
 
-	Eigen::MatrixXd output(output_vec.size(),1);
+	Eigen::MatrixXd output(input_vec.size(),1);
 
-	VecToMat(output_vec, output);
+	VecToMat(input_vec, output);
 
 	return output;
 }
@@ -65,43 +84,49 @@ const Eigen::MatrixXd FullyConnectedLayer::BackPropagate(const Eigen::MatrixXd &
 
 	MatToVec(gradient, gradient_vec);
 
-	Eigen::VectorXd weights_gradient;
-	Eigen::VectorXd weights_input;
+	// To update weights
+	Eigen::VectorXd update_vec(gradient.size());
 
-	Eigen::VectorXd output_vec;
-
+	// Back prop
 	{
 		std::vector<FullyConnectedLayerNode*>::const_reverse_iterator node = nodes.rbegin();
 		std::vector<Eigen::VectorXd>::const_reverse_iterator input = inputs.rbegin();
 
 		for (; node != nodes.rend(); node++, input++)
 		{
-			(*node)->Backward(*input, gradient_vec, output_vec);
-			
-			if(*node == weights_node)
+			// Save gradient at weights to update
+			if (*node == weights_node)
 			{
-				weights_gradient = gradient_vec;
-				weights_input = *input;
+				update_vec = gradient_vec;
 			}
 
-			gradient_vec = output_vec;
+			// Compute
+			(*node)->Backward(*input, gradient_vec);
 		}
 	}
 
+	// Update
 	if (!regularization)
 	{
-		weights_node->UpdateWeightsAndBiases(weights_gradient, weights_input, eta / mini_batch_size);
+		// We use the gradient at the node (total gradient by activation funct derivative of Z) & input of the whole layer (previous layer activations) to update the wheights and biases
+		weights_node->UpdateWeightsAndBiases(update_vec, inputs.front(), eta / mini_batch_size);
 	}
 	else
 	{
-		weights_node->UpdateWeightsAndBiasesRegular(weights_gradient, weights_input, eta, mini_batch_size, lambda);
+		// We use the gradient at the node (total gradient by activation funct derivative of Z) & input of the whole layer (previous layer activations) to update the wheights and biases
+		weights_node->UpdateWeightsAndBiasesRegular(update_vec, inputs.front(), eta, mini_batch_size, lambda);
 	}
 
-	Eigen::MatrixXd output(output_vec.size(), 1);
+	Eigen::MatrixXd output(gradient_vec.size(), 1);
 
-	VecToMat(output_vec, output);
+	VecToMat(gradient_vec, output);
 
 	return output;
+}
+
+void FullyConnectedLayer::CleanUp()
+{
+	inputs.clear();
 }
 
 Eigen::VectorXd FullyConnectedLayer::RandomInitBias(int num_neurons)
@@ -132,4 +157,102 @@ Eigen::MatrixXd FullyConnectedLayer::RandomInitWeight(int num_neurons, int previ
 	}
 
 	return new_mat;
+}
+
+void FullyConnectedLayer::UI()
+{
+	ImGui::TextWrapped("Fully Connected Layer");
+
+	for (std::vector<FullyConnectedLayerNode*>::const_iterator it = nodes.begin(); it != nodes.end(); it++)
+	{
+		if ((*it)->UINode())
+		{
+			focused = *it;
+		}
+
+		if (*it != nodes.back())
+		{
+			ImGui::SameLine();
+		}
+	}
+
+	focused->UIDescription();
+}
+
+void FullyConnectedLayer::AddFullyConnectedNode(int num_neurons, int num_conections)
+{
+	weights_node = new FullyConnectedNode(engine, num_neurons, num_conections);
+	nodes.push_back(weights_node);
+}
+
+void FullyConnectedLayer::AddReluNode()
+{
+	nodes.push_back(new ReluNode());
+}
+
+void FullyConnectedLayer::AddSigmoidNode()
+{
+	nodes.push_back(new SigmoidNode());
+}
+
+void FullyConnectedLayer::AddTanhNode()
+{
+	nodes.push_back(new TanhNode());
+}
+
+void FullyConnectedLayer::AddSoftMaxNode()
+{
+	nodes.push_back(new SoftMaxNode());
+}
+
+void FullyConnectedLayer::Debug()
+{
+	Eigen::MatrixXd debug_image(4, 4);
+	debug_image <<
+		1.0, 2.0, 3.0, 4.0,
+		5.0, 6.0, 7.0, 8.0,
+		9.0, 10.0, 11.0, 12.0,
+		13.0, 14.0, 15.0, 16.0;
+
+	Eigen::IOFormat fmt;
+	std::cerr << "Mat:\n" << debug_image.format(fmt) << std::endl;
+
+	Eigen::VectorXd vec(debug_image.size());
+	MatToVec(debug_image, vec);
+	std::cerr << "Vec:\n" << vec.format(fmt) << std::endl;
+
+	Eigen::MatrixXd mat(vec.rows(), 1);
+	VecToMat(vec, mat);
+	std::cerr << "Mat:\n" << mat.format(fmt) << std::endl;
+}
+
+const Eigen::MatrixXd & FullyConnectedLayer::GetWeights() const
+{
+	return weights_node->GetWeights();
+}
+
+const Eigen::MatrixXd & FullyConnectedLayer::GetBiases() const
+{
+	return weights_node->GetBiases();
+}
+
+void FullyConnectedLayer::MatToVec(const Eigen::MatrixXd & input, Eigen::VectorXd & output) const
+{
+	//output = Eigen::VectorXd(input);
+	for (int i = 0; i < input.rows(); i++)
+	{
+		for (int j = 0; j < input.cols(); j++)
+		{
+			output(i * input.cols() + j) = input(i, j);
+		}
+	}
+}
+
+void FullyConnectedLayer::VecToMat(const Eigen::VectorXd & input, Eigen::MatrixXd & output) const
+{
+	//output = Eigen::MatrixXd(input);
+	for (int i = 0; i < input.size(); i++)
+	{
+		output(i, 0) = input(i);
+	}
 }

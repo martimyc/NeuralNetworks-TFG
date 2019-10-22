@@ -13,12 +13,19 @@ FullyConnectedLayer::FullyConnectedLayer(int layer_neurons, int previous_layer_n
 	num_neurons(layer_neurons),
 	num_weights(previous_layer_neurons)
 {
-	// Random initialization
+	// Random Initialization
 	// Bias
-	biases = RandomInitBias(layer_neurons);
+	//biases = RandomInitBias(layer_neurons);
 
 	// Weights
-	weights = RandomInitWeight(layer_neurons, previous_layer_neurons);
+	//weights = RandomInitWeight(layer_neurons, previous_layer_neurons);
+
+	// Debug Initialization
+	// Bias
+	biases = DebugInitBias(layer_neurons);
+
+	// Weights
+	weights = DebugInitWeight(layer_neurons, previous_layer_neurons);
 }
 
 FullyConnectedLayer::~FullyConnectedLayer()
@@ -96,6 +103,32 @@ Eigen::MatrixXd FullyConnectedLayer::RandomInitWeight(int num_neurons, int previ
 		for (int j = 0; j < previous_layer_neurons; j++)
 		{
 			new_mat(i, j) = distribution(engine);
+		}
+	}
+
+	return new_mat;
+}
+
+Eigen::VectorXd FullyConnectedLayer::DebugInitBias(int num_neurons)
+{
+	Eigen::VectorXd new_vec(num_neurons);
+
+	for (int i = 0; i < num_neurons; i++)
+	{
+		new_vec(i) = 0.5;
+	}
+	return new_vec;
+}
+
+Eigen::MatrixXd FullyConnectedLayer::DebugInitWeight(int num_neurons, int previous_layer_neurons)
+{
+	Eigen::MatrixXd new_mat(num_neurons, previous_layer_neurons);
+
+	for (int i = 0; i < num_neurons; i++)
+	{
+		for (int j = 0; j < previous_layer_neurons; j++)
+		{
+			new_mat(i, j) = 0.5;
 		}
 	}
 

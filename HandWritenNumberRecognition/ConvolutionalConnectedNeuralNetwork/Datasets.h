@@ -36,7 +36,6 @@ public:
 	inline bool LoadingDone() const { return(training_load_state == LS_COMPLETED_SUCCESFULY && test_load_state == LS_COMPLETED_SUCCESFULY); }
 
 private:
-
 	// Load
 	void LoadTraining();
 	void LoadTest();

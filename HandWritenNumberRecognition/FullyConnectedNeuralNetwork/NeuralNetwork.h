@@ -29,8 +29,13 @@ public:
 
 	// Work
 	const Eigen::VectorXd& FeedForward(const Eigen::VectorXd& input);
-	void BackPropagation(const Eigen::VectorXd& error, const Eigen::VectorXd & input, float training_rate, int mini_batch_size, float lambda);
+	void BackPropagation(const Eigen::VectorXd& error, const Eigen::VectorXd & input, float eta, int mini_batch_size, float lambda);
 	void SGD(const std::vector<MNIST*>& training_data, int epochs, int mini_batch_size, float eta, float lambda = 0.0000f);
+
+	// Debug
+	const Eigen::VectorXd& DebugFeedForward(const Eigen::VectorXd& input);
+	void DebugBackPropagation(const Eigen::VectorXd& error, const Eigen::VectorXd & input, float eta, int mini_batch_size, float lambda);
+	void Debug();
 
 	// Getters
 	int GetResult(const Eigen::VectorXd& output) const;
@@ -47,6 +52,7 @@ public:
 
 private:
 	void UpdateWithMiniBatch(std::vector<MNIST*>& mini_batch, float eta, float lambda);
+	void DebugUpdateWithMiniBatch(std::vector<MNIST*>& mini_batch);
 
 	// Test
 	void TestOnValidation();

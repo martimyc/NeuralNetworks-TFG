@@ -23,9 +23,6 @@ public:
 	bool PostUpdate() override;
 	bool CleanUp() override;
 
-	// Layers
-	void AddFullyConnectedLayer(int num_neurons, int num_previous_layer_neurons);
-
 private:
 	NeuralNetwork* network;
 
@@ -33,12 +30,7 @@ private:
 
 	std::thread* training_thread;
 
-	bool training = false;
 	int training_sesion;
-
-	// Random
-	std::random_device rand_device;
-	std::mt19937 engine;
 };
 
 #endif // !ML_

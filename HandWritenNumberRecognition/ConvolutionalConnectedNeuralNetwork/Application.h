@@ -6,6 +6,7 @@
 
 // Modules
 class Module;
+class UI;
 class Window;
 class Dataset;
 class ML;
@@ -33,6 +34,7 @@ public:
 	Dataset* dataset;
 	ML* ml;
 	Analitycs* analitycs;
+	UI* ui;
 
 private:
 	std::vector<Module*> modules;

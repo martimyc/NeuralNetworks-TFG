@@ -9,8 +9,12 @@ public:
 	FullyConnectedLayerNode() {}
 	virtual ~FullyConnectedLayerNode() {}
 
-	virtual void Forward(const Eigen::VectorXd& input, Eigen::VectorXd& output) const = 0;
-	virtual void Backward(const Eigen::VectorXd& input, const Eigen::VectorXd& gradient, Eigen::VectorXd& output) = 0; // Chain rule
+	virtual void Forward(Eigen::VectorXd& input) const = 0;
+	virtual void Backward(const Eigen::VectorXd& input, Eigen::VectorXd& gradient) = 0; // Chain rule
+
+	// UI
+	virtual bool UINode() const = 0;
+	virtual void UIDescription() const = 0;
 };
 
 

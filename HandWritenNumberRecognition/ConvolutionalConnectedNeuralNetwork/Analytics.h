@@ -2,6 +2,7 @@
 #define ANALYTICS
 
 #include <vector>
+#include <mutex>
 
 #include "Module.h"
 
@@ -18,11 +19,13 @@ public:
 	bool PostUpdate() override;
 	bool CleanUp() override;
 
-	inline void AddResultValidation(float ac, float c) { validation_acuracy.push_back(ac); validation_cost.push_back(c); }
-	inline void AddResultTest(float ac, float c) { test_acuracy.push_back(ac); test_cost.push_back(c); }
-	inline void AddResultTraining(float ac, float c) { training_acuracy.push_back(ac); training_cost.push_back(c); }
+	inline void AddResultValidation(float ac, float c) { mtx.lock(); validation_acuracy.push_back(ac); validation_cost.push_back(c); mtx.unlock(); }
+	inline void AddResultTest(float ac, float c) { mtx.lock(); test_acuracy.push_back(ac); test_cost.push_back(c);  mtx.unlock(); }
+	inline void AddResultTraining(float ac, float c) { mtx.lock(); training_acuracy.push_back(ac); training_cost.push_back(c); mtx.unlock(); }
 
 private:
+	std::mutex mtx;
+
 	// Validation Results
 	std::vector<float> validation_acuracy;
 	std::vector<float> validation_cost;

@@ -13,6 +13,19 @@ enum LAYER_TYPE
 	LT_CONVOLUTION
 };
 
+enum ACTIVATION_FUNCTION
+{
+	AF_SIGMOID = 0,
+	AF_RELU,
+	AF_TANH,
+	AF_SOFTMAX
+};
+
+enum POOLING {
+	P_L2,
+	P_MAX
+};
+
 // Layers
 class ConvolutionLayer;
 class FullyConnectedLayer;
@@ -28,6 +41,10 @@ public:
 	// Work
 	virtual const Eigen::MatrixXd FeedForward(const Eigen::MatrixXd& input) = 0;
 	virtual const Eigen::MatrixXd BackPropagate(const Eigen::MatrixXd& gradient, float eta, float mini_batch_size, float lambda = 0.0f) const = 0;
+	virtual void CleanUp() = 0;
+
+	// UI
+	virtual void UI() = 0;
 
 	// Polimorphism
 	FullyConnectedLayer* AsFullyConnected();

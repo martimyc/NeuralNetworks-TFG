@@ -151,6 +151,7 @@
     <ClCompile Include="NeuralNetwork.cpp" />
     <ClCompile Include="ReluNode.cpp" />
     <ClCompile Include="SigmoidNode.cpp" />
+    <ClCompile Include="SoftMaxNode.cpp" />
     <ClCompile Include="TanhNode.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -264,6 +265,7 @@
     <ClInclude Include="SDL2-2.0.10\include\SDL_video.h" />
     <ClInclude Include="SDL2-2.0.10\include\SDL_vulkan.h" />
     <ClInclude Include="SigmoidNode.h" />
+    <ClInclude Include="SoftMaxNode.h" />
     <ClInclude Include="TanhNode.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="Window.h" />

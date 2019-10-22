@@ -21,12 +21,18 @@ ML::~ML()
 bool ML::Init()
 {
 	// Initialize NN
-	std::vector<int> hidden_layers;
+	/*std::vector<int> hidden_layers;
 	hidden_layers.reserve(NUM_HIDDEN_LAYERS);
 
 	hidden_layers.push_back(HIDDEN_LAYER_1);
 
-	network = new NeuralNetwork(INPUT_LAYER, hidden_layers, OUTPUT_LAYER, CF_CROSS_ENTHROPY, true);
+	network = new NeuralNetwork(INPUT_LAYER, hidden_layers, OUTPUT_LAYER, CF_CROSS_ENTHROPY, false);*/
+
+	// Debug
+	std::vector<int> hidden_layers;
+	hidden_layers.reserve(NUM_HIDDEN_LAYERS);
+	hidden_layers.push_back(HIDDEN_LAYER_1);
+	network = new NeuralNetwork(16, hidden_layers, OUTPUT_LAYER, CF_QUADRATIC, false);
 
 	output = -1;
 
@@ -69,7 +75,7 @@ bool ML::Update()
 		ImGui::TreePop();
 	}
 
-	if (!training && App->dataset->LoadingDone())
+	/*if (!training && App->dataset->LoadingDone())
 	{
 		training = true;
 		training_sesion++;
@@ -82,7 +88,9 @@ bool ML::Update()
 		delete training_thread;
 		training_thread = nullptr;
 		training = false;
-	}
+	}*/
+
+	network->Debug();
 
 	ImGui::End();
 

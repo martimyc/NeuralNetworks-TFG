@@ -9,20 +9,23 @@
 #include "Datasets.h"
 #include "ML.h"
 #include "Analytics.h"
+#include "UI.h"
 
-Application::Application(const std::string& name): name (name), runing(true), window(nullptr), dataset(nullptr), ml(nullptr), analitycs(nullptr)
+Application::Application(const std::string& name): name (name), runing(true), window(nullptr), dataset(nullptr), ml(nullptr), analitycs(nullptr), ui(nullptr)
 {
 	// Create modules
 	window = new Window(name, SCREEN_WIDTH, SCREEN_HEIGHT);
 	dataset = new Dataset();
 	ml = new ML();
 	analitycs = new Analitycs();
+	ui = new UI();
 
 	// Add modules
 	modules.push_back(window);
 	modules.push_back(dataset);
 	modules.push_back(ml);
 	modules.push_back(analitycs);
+	modules.push_back(ui);
 }
 
 Application::~Application()

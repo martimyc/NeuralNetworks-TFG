@@ -18,11 +18,13 @@ public:
 	// Initialization
 	static Eigen::VectorXd RandomInitBias(int num_neurons);
 	static Eigen::MatrixXd RandomInitWeight(int num_neurons, int previous_layer_neurons);
-
+	static Eigen::VectorXd DebugInitBias(int num_neurons);
+	static Eigen::MatrixXd DebugInitWeight(int num_neurons, int previous_layer_neurons);
 	// Getters
 	inline const Eigen::VectorXd& GetZ() override { return z; }
 	inline const Eigen::VectorXd& GetActivation() override { return activation_values; }
 	inline const Eigen::MatrixXd& GetWeights() override { return weights; }
+	inline const Eigen::VectorXd& GetBiases() override { return biases; }
 	inline const int GetNumNeurons() const override { return num_neurons; }
 
 private:
