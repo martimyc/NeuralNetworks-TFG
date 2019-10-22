@@ -13,7 +13,7 @@
 #include "Layer.h"
 #include "ConvolutionLayer.h"
 
-ML::ML() : Module("ML"), network(nullptr), training_thread(nullptr), training_sesion(0)
+ML::ML() : Module("ML"), network(nullptr), training_thread(nullptr)
 {}
 
 ML::~ML()
@@ -64,7 +64,7 @@ bool ML::Update()
 
 	if (ImGui::TreeNodeEx("Training", ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed))
 	{
-		ImGui::Text("Training Sesion %i", training_sesion);
+		ImGui::Text("Training Sesion %i", network->GetTrainingSesion());
 
 		ImGui::Text("Training rate: %f", TRAINING_RATE);
 
@@ -88,15 +88,7 @@ bool ML::Update()
 
 	if (training_thread == nullptr && App->dataset->LoadingDone())
 	{
-		training_sesion++;
-		training_thread = new std::thread(&NeuralNetwork::SGD, std::ref(*network), App->dataset->GetTrainingSet(), EPOCHS, MINI_BATCH_SIZE, TRAINING_RATE, REGULARIZATION_PARAMETER);
-	}
-
-	if (network->GetState() == S_DONE)
-	{
-		training_thread->join();
-		delete training_thread;
-		training_thread = nullptr;
+		InitNetworkTraining();
 	}
 
 	/*network->DebugConvolution();
@@ -115,6 +107,7 @@ bool ML::CleanUp()
 {
 	if (training_thread != nullptr)
 	{
+		network->Stop();
 		training_thread->join();
 		delete training_thread;
 		training_thread = nullptr;
@@ -123,4 +116,9 @@ bool ML::CleanUp()
 	delete network;
 
 	return true;
+}
+
+void ML::InitNetworkTraining()
+{
+	training_thread = new std::thread(&NeuralNetwork::SGD, std::ref(*network), App->dataset->GetTrainingSet(), EPOCHS, MINI_BATCH_SIZE, TRAINING_RATE, REGULARIZATION_PARAMETER);
 }

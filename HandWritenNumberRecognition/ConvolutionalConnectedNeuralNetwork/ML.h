@@ -23,14 +23,14 @@ public:
 	bool PostUpdate() override;
 	bool CleanUp() override;
 
+	void InitNetworkTraining();
+
 private:
 	NeuralNetwork* network;
 
 	int output;
 
 	std::thread* training_thread;
-
-	int training_sesion;
 };
 
 #endif // !ML_

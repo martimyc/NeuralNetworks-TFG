@@ -20,10 +20,15 @@
 #include "FullyConnectedLayer.h"
 #include "ConvolutionLayer.h"
 
-NeuralNetwork::NeuralNetwork( COST_FUNCTION cost_function, bool regularization): state(S_READY), cost_function(cost_function), regularization(regularization)
+NeuralNetwork::NeuralNetwork( COST_FUNCTION cost_function, bool regularization):
+	state(S_READY),
+	cost_function(cost_function),
+	regularization(regularization),
+	training_sesion(0)
 {
 	// Seed rand for later
 	std::srand(time(NULL));
+	state = S_TRAINING;
 }
 
 NeuralNetwork::~NeuralNetwork()
@@ -54,30 +59,34 @@ void NeuralNetwork::BackPropagation(const Eigen::MatrixXd& cost, float eta, int 
 
 void NeuralNetwork::SGD(const std::vector<MNIST*>& training_data, int epochs, int mini_batch_size, float eta, float lambda)
 {
-	state = S_TRAINING;
-
-	// todo paralel
-
-	for (int i = 0; i < epochs; i++)
+	while (state == S_TRAINING)
 	{
-		// Create random mini batch
-		// Starting point for mini batch. Somewhere between 0 and training data size - mini batch size
-		int start = std::rand() % (training_data.size() - mini_batch_size);
-		std::vector<MNIST*>::const_iterator start_point = training_data.begin() + start;
-		std::vector<MNIST*>::const_iterator end_point = training_data.begin() + start + mini_batch_size;
+		training_sesion++;
 
-		std::vector<MNIST*> mini_batch(start_point, end_point);
+		for (int i = 0; i < epochs; i++)
+		{
+			// Create random mini batch
+			// Starting point for mini batch. Somewhere between 0 and training data size - mini batch size
+			int start = std::rand() % (training_data.size() - mini_batch_size);
+			std::vector<MNIST*>::const_iterator start_point = training_data.begin() + start;
+			std::vector<MNIST*>::const_iterator end_point = training_data.begin() + start + mini_batch_size;
 
-		// Train with minibatch
-		UpdateWithMiniBatch(mini_batch, eta, lambda);
+			std::vector<MNIST*> mini_batch(start_point, end_point);
 
-		// Test
-		TestOnValidation();
-		//TestOnTest();
-		//TestOnTraining();
+			// Train with minibatch
+			UpdateWithMiniBatch(mini_batch, eta, lambda);
+
+			// Test
+			TestOnValidation();
+			//TestOnTest();
+			//TestOnTraining();
+			
+			if (state != S_TRAINING)
+			{
+				break;
+			}
+		}
 	}
-
-	state = S_DONE;
 }
 
 int NeuralNetwork::ComputeResult(Eigen::MatrixXd & input) const
@@ -211,6 +220,11 @@ void NeuralNetwork::DebugLayer()
 void NeuralNetwork::DebugConvolution()
 {
 	layers.front()->AsConvolution()->Debug();
+}
+
+void NeuralNetwork::Stop()
+{
+	state = S_DONE;
 }
 
 // Private

@@ -44,6 +44,7 @@ public:
 
 	// Getters
 	inline const STATE& GetState() const { return state; }
+	inline int GetTrainingSesion() const { return training_sesion; }
 
 	// UI
 	void Info() const;
@@ -54,6 +55,9 @@ public:
 	void DebugBackPropagation(const Eigen::MatrixXd& cost);
 	void DebugLayer();
 	void DebugConvolution();
+
+	// Thread
+	void Stop();
 
 private:
 	// Work
@@ -78,6 +82,7 @@ private:
 	STATE state;
 	COST_FUNCTION cost_function;
 	bool regularization;
+	int training_sesion;
 };
 
 #endif //!NEURALNETWORK
