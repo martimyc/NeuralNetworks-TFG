@@ -1,8 +1,22 @@
 #include "Analytics.h"
 
 #include "imgui.h"
+#include "Globals.h"
 
-Analitycs::Analitycs(): Module("Analytics")
+Analitycs::Analitycs():
+	Module("Analytics"),
+	validation_max_acuracy(0.0f),
+	validation_min_cost(0.0f),
+	validation_max_acuracy_training_sesion(0),
+	validation_min_cost_training_sesion(0),
+	test_max_acuracy(0.0f),
+	test_min_cost(0.0f),
+	test_max_acuracy_training_sesion(0),
+	test_min_cost_training_sesion(0),
+	training_max_acuracy(0.0f),
+	training_min_cost(0.0f),
+	training_max_acuracy_training_sesion(0),
+	training_min_cost_training_sesion(0)
 {}
 
 Analitycs::~Analitycs()
@@ -20,48 +34,59 @@ bool Analitycs::PreUpdate()
 
 bool Analitycs::Update()
 {
-	ImGui::Begin("Analytics");
-	ImGui::Columns(3);
-
 	// Validation Results
 	if (validation_acuracy.size() > 0)
 	{
-		ImGui::Text("Validation Results:");
+		ImGui::Begin("Validation Results:");
+
+		ImGui::Text("Best acuracy: %f at training session %i", validation_max_acuracy, validation_max_acuracy_training_sesion);
+		ImGui::Text("Lowest cost: %f at training session %i", validation_min_cost, validation_min_cost_training_sesion);
+		ImGui::Separator();
 
 		ImGui::Text("Acuracy");
-		ImGui::PlotHistogram("Results (%)", &validation_acuracy[0], validation_acuracy.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, ImVec2(500, 200));
+		ImGui::PlotHistogram("Results (%)", &validation_acuracy[0], validation_acuracy.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, HISTOGRAM_SIZE);
 
 		ImGui::Text("Cost");
-		ImGui::PlotHistogram("Results (%)", &validation_cost[0], validation_cost.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, ImVec2(500, 200));
+		ImGui::PlotHistogram("Results (%)", &validation_cost[0], validation_cost.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, HISTOGRAM_SIZE);
+
+		ImGui::End();
 	}
-	ImGui::NextColumn();
 
 	// Test Results
 	if (test_acuracy.size() > 0)
 	{
-		ImGui::Text("Test Results:");
+		ImGui::Begin("Test Results:");
+
+		ImGui::Text("Best acuracy: %f at training session %i", test_max_acuracy, test_max_acuracy_training_sesion);
+		ImGui::Text("Lowest cost: %f at training session %i", test_min_cost, test_min_cost_training_sesion);
+		ImGui::Separator();
 
 		ImGui::Text("Acuracy");
-		ImGui::PlotHistogram("Results (%)", &test_acuracy[0], test_acuracy.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, ImVec2(500, 200));
+		ImGui::PlotHistogram("Results (%)", &test_acuracy[0], test_acuracy.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, HISTOGRAM_SIZE);
 
 		ImGui::Text("Cost");
-		ImGui::PlotHistogram("Results (%)", &test_cost[0], test_cost.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, ImVec2(500, 200));
+		ImGui::PlotHistogram("Results (%)", &test_cost[0], test_cost.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, HISTOGRAM_SIZE);
+		
+		ImGui::End();
 	}
-	ImGui::NextColumn();
 
 	// Training Results
 	if (training_acuracy.size() > 0)
 	{
-		ImGui::Text("Training Results:");
+		ImGui::Begin("Training Results:");
 
+		ImGui::Text("Best acuracy: %f at training session %i", training_max_acuracy, training_max_acuracy_training_sesion);
+		ImGui::Text("Lowest cost: %f at training session %i", training_min_cost, training_min_cost_training_sesion);
+		ImGui::Separator();
+		
 		ImGui::Text("Acuracy");
-		ImGui::PlotHistogram("Results (%)", &training_acuracy[0], training_acuracy.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, ImVec2(500, 200));
+		ImGui::PlotHistogram("Results (%)", &training_acuracy[0], training_acuracy.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, HISTOGRAM_SIZE);
 
 		ImGui::Text("Cost");
-		ImGui::PlotHistogram("Results (%)", &training_cost[0], training_cost.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, ImVec2(500, 200));
+		ImGui::PlotHistogram("Results (%)", &training_cost[0], training_cost.size(), 0, 0, 3.402823466e+38F, 3.402823466e+38F, HISTOGRAM_SIZE);
+		
+		ImGui::End();
 	}
-
-	ImGui::End();
 
 	return true;
 }
@@ -74,4 +99,64 @@ bool Analitycs::PostUpdate()
 bool Analitycs::CleanUp()
 {
 	return true;
+}
+
+void Analitycs::AddResultValidation(float ac, float c)
+{
+	mtx.lock();
+	if (validation_max_acuracy < ac)
+	{
+		validation_max_acuracy = ac;
+		validation_max_acuracy_training_sesion = validation_acuracy.size();
+	}
+
+	if (validation_min_cost > c)
+	{
+		validation_min_cost = c;
+		validation_min_cost_training_sesion = validation_acuracy.size();
+	}
+
+	validation_acuracy.push_back(ac);
+	validation_cost.push_back(c);
+	mtx.unlock();
+}
+
+void Analitycs::AddResultTest(float ac, float c)
+{
+	mtx.lock();
+	if (test_max_acuracy < ac)
+	{
+		test_max_acuracy = ac;
+		test_max_acuracy_training_sesion = test_acuracy.size();
+	}
+
+	if (test_min_cost > c)
+	{
+		test_min_cost = c;
+		test_min_cost_training_sesion = test_acuracy.size();
+	}
+
+	test_acuracy.push_back(ac);
+	test_cost.push_back(c);
+	mtx.unlock();
+}
+
+void Analitycs::AddResultTraining(float ac, float c)
+{
+	mtx.lock();
+	if (training_max_acuracy < ac)
+	{
+		training_max_acuracy = ac;
+		training_max_acuracy_training_sesion = training_acuracy.size();
+	}
+
+	if (training_min_cost > c)
+	{
+		training_min_cost = c;
+		training_min_cost_training_sesion = training_acuracy.size();
+	}
+
+	training_acuracy.push_back(ac);
+	training_cost.push_back(c);
+	mtx.unlock();
 }

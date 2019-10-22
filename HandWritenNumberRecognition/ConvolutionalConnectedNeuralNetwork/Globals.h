@@ -21,4 +21,6 @@
 
 #define POOLING_WINDOW 4
 
+#define HISTOGRAM_SIZE ImVec2(500, 200)
+
 #endif //!GLOBALS

@@ -19,9 +19,9 @@ public:
 	bool PostUpdate() override;
 	bool CleanUp() override;
 
-	inline void AddResultValidation(float ac, float c) { mtx.lock(); validation_acuracy.push_back(ac); validation_cost.push_back(c); mtx.unlock(); }
-	inline void AddResultTest(float ac, float c) { mtx.lock(); test_acuracy.push_back(ac); test_cost.push_back(c);  mtx.unlock(); }
-	inline void AddResultTraining(float ac, float c) { mtx.lock(); training_acuracy.push_back(ac); training_cost.push_back(c); mtx.unlock(); }
+	void AddResultValidation(float ac, float c);
+	void AddResultTest(float ac, float c);
+	void AddResultTraining(float ac, float c);
 
 private:
 	std::mutex mtx;
@@ -29,14 +29,26 @@ private:
 	// Validation Results
 	std::vector<float> validation_acuracy;
 	std::vector<float> validation_cost;
+	float validation_max_acuracy;	
+	float validation_min_cost;
+	int validation_max_acuracy_training_sesion;
+	int validation_min_cost_training_sesion;
 
 	// Test Results
 	std::vector<float> test_acuracy;
 	std::vector<float> test_cost;
+	float test_max_acuracy;
+	float test_min_cost;
+	int test_max_acuracy_training_sesion;
+	int test_min_cost_training_sesion;
 
 	// Training Results
 	std::vector<float> training_acuracy;
 	std::vector<float> training_cost;
+	float training_max_acuracy;
+	float training_min_cost;
+	int training_max_acuracy_training_sesion;
+	int training_min_cost_training_sesion;
 };
 
 #endif //!ANALYTICS
