@@ -152,7 +152,7 @@ void ConvolutionNode::UpdateWeightsAndBiasesRegular(const std::vector<Eigen::Mat
 	std::vector<Eigen::MatrixXd>::const_iterator gradient = gradients.begin();
 	std::vector<Eigen::MatrixXd>::const_iterator input = inputs.begin();
 
-	for (; input != inputs.end(); input++, gradient++)
+	for (; input != inputs.end(); input++)
 	{
 		for (std::vector<Kernel>::iterator kernel = kernels.begin(); kernel != kernels.end(); kernel++, gradient++)
 		{

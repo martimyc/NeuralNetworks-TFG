@@ -19,7 +19,9 @@ public:
 	void Backward(const std::vector<Eigen::MatrixXd>& inputs, std::vector<Eigen::MatrixXd>& gradients) override;
 
 	static double Sigmoid(double input);
+	static void MatrixSigmoid(Eigen::MatrixXd& input);
 	static double Derivative(double input);
+	static void MatrixDerivative(Eigen::MatrixXd& input);
 
 	// UI
 	bool UINode() const override;

@@ -75,17 +75,17 @@ void NeuralNetwork::SGD(const std::vector<MNIST*>& training_data, int epochs, in
 
 			// Train with minibatch
 			UpdateWithMiniBatch(mini_batch, eta, lambda);
-
-			// Test
-			TestOnValidation();
-			//TestOnTest();
-			//TestOnTraining();
 			
 			if (state != S_TRAINING)
 			{
 				break;
 			}
 		}
+
+		// Test
+		//TestOnValidation();
+		TestOnTest();
+		//TestOnTraining();
 	}
 }
 
@@ -96,9 +96,9 @@ int NeuralNetwork::ComputeResult(Eigen::MatrixXd & input) const
 }
 
 // Layers
-FullyConnectedLayer * NeuralNetwork::AddFullyConnectedLayer(int layer_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool regularization)
+FullyConnectedLayer * NeuralNetwork::AddFullyConnectedLayer(int layer_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool output, bool regularization)
 {
-	layers.push_back(new FullyConnectedLayer(layer_neurons, previous_layer_neurons, activation_funct, regularization));
+	layers.push_back(new FullyConnectedLayer(layer_neurons, previous_layer_neurons, activation_funct,output, regularization));
 	return (FullyConnectedLayer *)layers.back();
 }
 
@@ -111,7 +111,21 @@ ConvolutionLayer * NeuralNetwork::AddConvolutionLayer(int k_size, POOLING poolin
 // UI
 void NeuralNetwork::Info() const
 {
-	ImGui::Text("Layers: %i", layers.size());
+	switch (cost_function)
+	{
+	case CF_QUADRATIC:
+		ImGui::Text("Cost function: quadratic", layers.size());
+		break;
+	case CF_CROSS_ENTHROPY:
+		ImGui::Text("Cost function: cross enthropy", layers.size());
+		break;
+	case CF_LOG_LIKELIHOOD:
+		break;
+	default:
+		break;
+	}
+
+	ImGui::Separator();
 
 	ImGui::Columns(layers.size(), "word-wrapping");
 
@@ -126,6 +140,7 @@ void NeuralNetwork::Info() const
 	}
 
 	ImGui::Columns();
+	ImGui::Separator();
 }
 
 void NeuralNetwork::Debug()
@@ -175,7 +190,7 @@ void NeuralNetwork::Debug()
 	std::cerr << "Output:\n" << input.format(fmt) << std::endl;
 
 	// With the first layers error we can back propagate and get the next layer's error as well as change its weights and biases
-	DebugBackPropagation(Delta(input, desired));
+	DebugBackPropagation(Delta(input, desired, 1));
 }
 
 void NeuralNetwork::DebugFeedForward(Eigen::MatrixXd & input) const
@@ -242,7 +257,7 @@ void NeuralNetwork::UpdateWithMiniBatch(std::vector<MNIST*>& mini_batch, float e
 		desired((*it)->GetLabel(), 0) = 1.0;
 
 		// Back Propagate
-		BackPropagation(Delta(input, desired), eta, mini_batch.size(), lambda);
+		BackPropagation(Delta(input, desired, (*it)->GetLabel()), eta, mini_batch.size(), lambda);
 
 		// Clean up layers for next image
 		for (std::vector<Layer*>::const_iterator it = layers.begin(); it != layers.end(); it++)
@@ -253,21 +268,16 @@ void NeuralNetwork::UpdateWithMiniBatch(std::vector<MNIST*>& mini_batch, float e
 }
 
 // Cost Functions
-Eigen::MatrixXd NeuralNetwork::Delta(const Eigen::MatrixXd & activation, const Eigen::MatrixXd & desired) const
+Eigen::MatrixXd NeuralNetwork::Delta(const Eigen::MatrixXd & activation, const Eigen::MatrixXd & desired, int label) const
 {
 	// Check
 	switch (cost_function)
 	{
-	case CF_QUADRATIC: return activation - desired;
+	case CF_QUADRATIC: return layers.back()->AsFullyConnected()->GetPrimeZ().asDiagonal() * (activation - desired);
 	case CF_CROSS_ENTHROPY: return activation - desired;
-	case CF_LOG_LIKELIHOOD: 
+	case CF_LOG_LIKELIHOOD:
 	{
-		Eigen::MatrixXd output = activation - desired;
-		/*for (int i = 0; i < desired.rows(); i++)
-		{
-			output(i) = -log(1.0 - output(i));
-		}*/
-		return output;
+	// TODO
 	}
 
 	default:
@@ -296,7 +306,7 @@ void NeuralNetwork::TestOnValidation()
 		desired(label,0) = 1.0;
 
 		// Calculate cost
-		cost += Cost(input, desired);
+		cost += Cost(input, desired, label);
 
 		if (result == label)
 		{
@@ -325,7 +335,7 @@ void NeuralNetwork::TestOnTest()
 		desired(label, 0) = 1.0;
 
 		// Calculate cost
-		cost += Cost(input, desired);
+		cost += Cost(input, desired, label);
 
 		if (result == label)
 		{
@@ -363,7 +373,7 @@ void NeuralNetwork::TestOnTraining()
 		desired(label, 0) = 1.0;
 
 		// Calculate cost
-		cost += Cost(input, desired);
+		cost += Cost(input, desired, label);
 
 		if (result == label)
 		{
@@ -373,7 +383,7 @@ void NeuralNetwork::TestOnTraining()
 	App->analitycs->AddResultTraining((float)correct_answers / 10000.0f, cost);
 }
 
-float NeuralNetwork::Cost(const Eigen::MatrixXd& output, const Eigen::MatrixXd& desired)
+float NeuralNetwork::Cost(const Eigen::MatrixXd& output, const Eigen::MatrixXd& desired, int label)
 {
 	switch (cost_function)
 	{
@@ -390,7 +400,7 @@ float NeuralNetwork::Cost(const Eigen::MatrixXd& output, const Eigen::MatrixXd& 
 		return cost;
 	}
 	case CF_LOG_LIKELIHOOD:
-		return -log(output(desired.maxCoeff(), 0));
+		return -log(output(label, 0));
 
 	default:
 		std::cerr << "NeuralNetwork - TotalCost - No or unknown cost function" << std::endl;

@@ -28,6 +28,7 @@ public:
 private:
 	Eigen::MatrixXd weights;
 	Eigen::MatrixXd biases;
+	Eigen::MatrixXd z;
 };
 
 #endif // !FULLY_CONNECTED_NODE

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <mutex>
+#include <time.h>
 
 #include "Module.h"
 
@@ -22,6 +23,8 @@ public:
 	void AddResultValidation(float ac, float c);
 	void AddResultTest(float ac, float c);
 	void AddResultTraining(float ac, float c);
+
+	void StartTimer();
 
 private:
 	std::mutex mtx;
@@ -49,6 +52,10 @@ private:
 	float training_min_cost;
 	int training_max_acuracy_training_sesion;
 	int training_min_cost_training_sesion;
+
+	// Timer
+	time_t start_time;
+	time_t elapsed_time;
 };
 
 #endif //!ANALYTICS

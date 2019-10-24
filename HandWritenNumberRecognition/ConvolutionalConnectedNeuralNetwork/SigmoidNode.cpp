@@ -47,9 +47,19 @@ double SigmoidNode::Sigmoid(double input)
 	return 1.0 / (1.0 + exp(-input));
 }
 
+void SigmoidNode::MatrixSigmoid(Eigen::MatrixXd & input)
+{
+	input = input.unaryExpr(&Sigmoid);
+}
+
 double SigmoidNode::Derivative(double input)
 {
 	return Sigmoid(input)*(1.0 - Sigmoid(input));
+}
+
+void SigmoidNode::MatrixDerivative(Eigen::MatrixXd & input)
+{
+	input = input.unaryExpr(&Derivative);
 }
 
 bool SigmoidNode::UINode() const

@@ -47,9 +47,19 @@ double TanhNode::Tanh(double input)
 	return (exp(input) - exp(-input)) / (exp(input) + exp(-input));
 }
 
+void TanhNode::MatrixTanh(Eigen::MatrixXd & input)
+{
+	input = input.unaryExpr(&Tanh);
+}
+
 double TanhNode::Derivative(double input)
 {
 	return 1.0 - Tanh(input) * Tanh(input);
+}
+
+void TanhNode::MatrixDerivative(Eigen::MatrixXd & input)
+{
+	input = input.unaryExpr(&Derivative);
 }
 
 bool TanhNode::UINode() const

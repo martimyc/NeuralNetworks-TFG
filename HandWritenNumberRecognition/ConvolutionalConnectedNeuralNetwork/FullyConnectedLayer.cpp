@@ -14,11 +14,13 @@
 #include "TanhNode.h"
 #include "SoftMaxNode.h"
 
-FullyConnectedLayer::FullyConnectedLayer(int layer_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool regularization) :
+FullyConnectedLayer::FullyConnectedLayer(int layer_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool output, bool regularization) :
 	Layer(LT_FULLY_CONNECTED, regularization),
 	num_neurons(layer_neurons),
 	num_weights(previous_layer_neurons),
-	focused(nullptr)
+	focused(nullptr),
+	output(output),
+	activation_function(activation_funct)
 {
 	AddFullyConnectedNode(layer_neurons, previous_layer_neurons);
 
@@ -69,6 +71,12 @@ const Eigen::MatrixXd FullyConnectedLayer::FeedForward(const Eigen::MatrixXd& in
 
 		// Compute and update vec
 		(*node)->Forward(input_vec);
+
+		// Save Z
+		if (*node == weights_node)
+		{
+			z = input_vec;
+		}
 	}
 
 	Eigen::MatrixXd output(input_vec.size(),1);
@@ -91,6 +99,13 @@ const Eigen::MatrixXd FullyConnectedLayer::BackPropagate(const Eigen::MatrixXd &
 	{
 		std::vector<FullyConnectedLayerNode*>::const_reverse_iterator node = nodes.rbegin();
 		std::vector<Eigen::VectorXd>::const_reverse_iterator input = inputs.rbegin();
+
+		/* When in the output layer the cost is calculated for the whole network and therefore we have no need to
+		backprop through the activation function, cost function has already taken care of that for us*/
+		if (output)
+		{
+			node++;
+		}
 
 		for (; node != nodes.rend(); node++, input++)
 		{
@@ -161,7 +176,14 @@ Eigen::MatrixXd FullyConnectedLayer::RandomInitWeight(int num_neurons, int previ
 
 void FullyConnectedLayer::UI()
 {
-	ImGui::TextWrapped("Fully Connected Layer");
+	if (nodes.back()->Type() == NT_SOFTMAX)
+	{
+		ImGui::TextWrapped("Softmax Layer");
+	}
+	else
+	{
+		ImGui::TextWrapped("Fully Connected Layer");
+	}
 
 	for (std::vector<FullyConnectedLayerNode*>::const_iterator it = nodes.begin(); it != nodes.end(); it++)
 	{
@@ -234,6 +256,21 @@ const Eigen::MatrixXd & FullyConnectedLayer::GetWeights() const
 const Eigen::MatrixXd & FullyConnectedLayer::GetBiases() const
 {
 	return weights_node->GetBiases();
+}
+
+const Eigen::MatrixXd FullyConnectedLayer::GetPrimeZ() const
+{
+	Eigen::MatrixXd output = z;
+
+	switch (activation_function)
+	{
+	case AF_SIGMOID: ((SigmoidNode*)nodes.back())->MatrixDerivative(output); break;
+	case AF_TANH: ((TanhNode*)nodes.back())->MatrixDerivative(output); break;
+	default:
+		std::cerr << "FullyConnectedLayer - GetPrimeZ - Activation function not suported as output" << std::endl;
+		break;
+	}
+	return output;
 }
 
 void FullyConnectedLayer::MatToVec(const Eigen::MatrixXd & input, Eigen::VectorXd & output) const

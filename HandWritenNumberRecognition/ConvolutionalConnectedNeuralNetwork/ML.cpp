@@ -9,6 +9,7 @@
 #include "NeuralNetwork.h"
 #include "Application.h"
 #include "Datasets.h"
+#include "Analytics.h"
 #include "MNIST.h"
 #include "Layer.h"
 #include "ConvolutionLayer.h"
@@ -28,20 +29,25 @@ bool ML::Init()
 	//network->AddFullyConnectedLayer(10, 30, AF_SOFTMAX, false);
 
 	// Convolutional
-	ConvolutionLayer* conv_layer = network->AddConvolutionLayer(4, P_MAX, AF_RELU, 4, IMAGE_SIZE);
-	conv_layer = network->AddConvolutionLayer(4, P_MAX, AF_RELU, 4, conv_layer->GetOutputImageSize());
+	ConvolutionLayer* conv_layer = network->AddConvolutionLayer(4, P_MAX, AF_RELU, 4, IMAGE_SIZE, true);
+	conv_layer = network->AddConvolutionLayer(4, P_MAX, AF_RELU, 4, conv_layer->GetOutputImageSize(), true);
 
 	// Fully Connected
 	// neurons to fully connect
 	// Image size of last layer * number of filters of layers before (4 in the first 4 in the second)
 	int num_neurons = conv_layer->GetOutputImageSize() * 4 * 4; 
 
-	network->AddFullyConnectedLayer(30, num_neurons, AF_SIGMOID);
-	network->AddFullyConnectedLayer(10, 30, AF_SIGMOID);
+	network->AddFullyConnectedLayer(30, num_neurons, AF_RELU);
+	network->AddFullyConnectedLayer(16, 30, AF_RELU, false, true);
+	network->AddFullyConnectedLayer(10, 16, AF_SOFTMAX, true, true);
 
 	// Debug
 	//network->AddFullyConnectedLayer(30, 4*4, AF_SIGMOID, false);
 	//network->AddFullyConnectedLayer(10, 30, AF_SIGMOID, false);
+
+	/*network->AddFullyConnectedLayer(30, IMAGE_SIZE, AF_SIGMOID, false, true);
+	network->AddFullyConnectedLayer(16, 30, AF_SIGMOID, false, true);
+	network->AddFullyConnectedLayer(10, 16, AF_SOFTMAX, true, true);*/
 
 	output = -1;
 
@@ -121,4 +127,5 @@ bool ML::CleanUp()
 void ML::InitNetworkTraining()
 {
 	training_thread = new std::thread(&NeuralNetwork::SGD, std::ref(*network), App->dataset->GetTrainingSet(), EPOCHS, MINI_BATCH_SIZE, TRAINING_RATE, REGULARIZATION_PARAMETER);
+	App->analitycs->StartTimer();
 }

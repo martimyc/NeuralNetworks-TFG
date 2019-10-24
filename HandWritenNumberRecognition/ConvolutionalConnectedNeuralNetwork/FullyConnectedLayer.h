@@ -9,7 +9,7 @@ class FullyConnectedNode;
 class FullyConnectedLayer : public Layer
 {
 public:
-	FullyConnectedLayer(int num_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool regularization = false);
+	FullyConnectedLayer(int num_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool output = false, bool regularization = false);
 	~FullyConnectedLayer();
 
 	// Work
@@ -37,6 +37,7 @@ public:
 	// Getters
 	const Eigen::MatrixXd& GetWeights() const;
 	const Eigen::MatrixXd& GetBiases() const;
+	const Eigen::MatrixXd GetPrimeZ() const;
 
 private:
 	void MatToVec(const Eigen::MatrixXd& input, Eigen::VectorXd& output) const;
@@ -55,9 +56,14 @@ private:
 	// Info
 	int num_neurons;
 	int num_weights;
+	ACTIVATION_FUNCTION activation_function;
 
 	// UI
 	FullyConnectedLayerNode* focused;
+
+	// Output layer
+	bool output;
+	Eigen::VectorXd z;
 };
 
 

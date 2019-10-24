@@ -35,11 +35,13 @@ public:
 	// Work
 	void FeedForward(Eigen::MatrixXd& input) const;
 	void BackPropagation(const Eigen::MatrixXd& cost, float eta, int mini_batch_size, float lambda);
+
 	void SGD(const std::vector<MNIST*>& training_data, int epochs, int mini_batch_size, float eta, float lambda = 0.0000f);
+
 	int ComputeResult(Eigen::MatrixXd& input) const;
 
 	// Layers
-	FullyConnectedLayer * AddFullyConnectedLayer(int layer_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool regularization = false);
+	FullyConnectedLayer * AddFullyConnectedLayer(int layer_neurons, int previous_layer_neurons, ACTIVATION_FUNCTION activation_funct, bool output = false, bool regularization = false);
 	ConvolutionLayer * AddConvolutionLayer(int k_size, POOLING pooling, ACTIVATION_FUNCTION activation_function, int num_filters, int input_image_size, bool regularization = false);
 
 	// Getters
@@ -64,7 +66,7 @@ private:
 	void UpdateWithMiniBatch(std::vector<MNIST*>& mini_batch, float eta, float lambda);
 
 	// Cost functions
-	Eigen::MatrixXd Delta(const Eigen::MatrixXd& activation, const Eigen::MatrixXd& desired) const; // Computes overall cost based on the diferent cost functions
+	Eigen::MatrixXd Delta(const Eigen::MatrixXd& activation, const Eigen::MatrixXd& desired, int label) const; // Computes overall cost based on the diferent cost functions
 
 	// Test
 	void TestOnValidation();
@@ -75,7 +77,7 @@ private:
 	int GetResult(const Eigen::MatrixXd& output) const;
 
 	// Analytics
-	float Cost(const Eigen::MatrixXd& output, const Eigen::MatrixXd& desired);
+	float Cost(const Eigen::MatrixXd& output, const Eigen::MatrixXd& desired, int label);
 
 private:
 	std::vector<Layer*> layers;
@@ -83,6 +85,7 @@ private:
 	COST_FUNCTION cost_function;
 	bool regularization;
 	int training_sesion;
+
 };
 
 #endif //!NEURALNETWORK

@@ -1,11 +1,14 @@
 #include "FullyConnectedNode.h"
 
+#include <limits>
+
 #include "imgui.h"
 
 FullyConnectedNode::FullyConnectedNode(std::mt19937 & engine, int num_neurons, int num_connections):
 	ComputationNode(NT_FULLY_CONNECTED),
 	weights(num_neurons, num_connections),
-	biases(num_neurons, 1)
+	biases(num_neurons, 1),
+	z(num_neurons, 1)
 {
 	// Weigths
 	std::normal_distribution<double> distribution_weights(0.0, 1.0 / sqrt(num_connections));
@@ -31,13 +34,13 @@ FullyConnectedNode::FullyConnectedNode(std::mt19937 & engine, int num_neurons, i
 	{
 		for (int j = 0; j < num_connections; j++)
 		{
-			weights(i, j) = 0.5;
+			weights(i, j) = rand() / std::numeric_limits<double>::max();
 		}
 	}
 
 	for (int i = 0; i < biases.rows(); i++)
 	{
-		biases(i, 0) = 0.5;
+		biases(i, 0) = rand() / std::numeric_limits<double>::max();
 	}*/
 }
 

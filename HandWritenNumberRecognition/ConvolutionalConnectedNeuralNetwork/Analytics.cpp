@@ -1,20 +1,22 @@
 #include "Analytics.h"
 
+#include <limits>
+
 #include "imgui.h"
 #include "Globals.h"
 
 Analitycs::Analitycs():
 	Module("Analytics"),
 	validation_max_acuracy(0.0f),
-	validation_min_cost(0.0f),
+	validation_min_cost(std::numeric_limits<float>::max()),
 	validation_max_acuracy_training_sesion(0),
 	validation_min_cost_training_sesion(0),
 	test_max_acuracy(0.0f),
-	test_min_cost(0.0f),
+	test_min_cost(std::numeric_limits<float>::max()),
 	test_max_acuracy_training_sesion(0),
 	test_min_cost_training_sesion(0),
 	training_max_acuracy(0.0f),
-	training_min_cost(0.0f),
+	training_min_cost(std::numeric_limits<float>::max()),
 	training_max_acuracy_training_sesion(0),
 	training_min_cost_training_sesion(0)
 {}
@@ -57,7 +59,7 @@ bool Analitycs::Update()
 	{
 		ImGui::Begin("Test Results:");
 
-		ImGui::Text("Best acuracy: %f at training session %i", test_max_acuracy, test_max_acuracy_training_sesion);
+		ImGui::Text("Best acuracy: %f at training session %i after %i seconds of training", test_max_acuracy, test_max_acuracy_training_sesion, elapsed_time);
 		ImGui::Text("Lowest cost: %f at training session %i", test_min_cost, test_min_cost_training_sesion);
 		ImGui::Separator();
 
@@ -128,6 +130,8 @@ void Analitycs::AddResultTest(float ac, float c)
 	{
 		test_max_acuracy = ac;
 		test_max_acuracy_training_sesion = test_acuracy.size();
+		time(&elapsed_time);
+		elapsed_time = elapsed_time - start_time;
 	}
 
 	if (test_min_cost > c)
@@ -159,4 +163,9 @@ void Analitycs::AddResultTraining(float ac, float c)
 	training_acuracy.push_back(ac);
 	training_cost.push_back(c);
 	mtx.unlock();
+}
+
+void Analitycs::StartTimer()
+{
+	time(&start_time);
 }
